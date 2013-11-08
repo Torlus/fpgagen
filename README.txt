@@ -1,6 +1,6 @@
 ================================================================================
 fpgagen - a SEGA Megadrive/Genesis clone in a FPGA.
-Copyright (c) 2010 Gregory Estrade (greg@torlus.com)
+Copyright (c) 2010-2013 Gregory Estrade (greg@torlus.com)
 All rights reserved
 
 fpgagen is an attempt to clone the SEGA Megadrive/Genesis console in a FPGA.
