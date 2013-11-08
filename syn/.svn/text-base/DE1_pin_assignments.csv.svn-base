@@ -1,0 +1,466 @@
+# Copyright (C) 1991-2006 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+
+# Quartus II Version 6.0 Build 202 06/20/2006 Service Pack 1 SJ Full Version
+# File: C:\DE1\DE1_TOP\DE1_TOP.csv
+# Generated on: Wed Sep 27 14:39:29 2006
+
+# Note: The column header names should not be changed if you wish to import this .csv file into the Quartus II software.
+
+From,To,Assignment Name,Value,Enabled
+,GPIO_0[0],Location,PIN_A13,Yes
+,GPIO_0[1],Location,PIN_B13,Yes
+,GPIO_0[2],Location,PIN_A14,Yes
+,GPIO_0[3],Location,PIN_B14,Yes
+,GPIO_0[4],Location,PIN_A15,Yes
+,GPIO_0[5],Location,PIN_B15,Yes
+,GPIO_0[6],Location,PIN_A16,Yes
+,GPIO_0[7],Location,PIN_B16,Yes
+,GPIO_0[8],Location,PIN_A17,Yes
+,GPIO_0[9],Location,PIN_B17,Yes
+,GPIO_0[10],Location,PIN_A18,Yes
+,GPIO_0[11],Location,PIN_B18,Yes
+,GPIO_0[12],Location,PIN_A19,Yes
+,GPIO_0[13],Location,PIN_B19,Yes
+,GPIO_0[14],Location,PIN_A20,Yes
+,GPIO_0[15],Location,PIN_B20,Yes
+,GPIO_0[16],Location,PIN_C21,Yes
+,GPIO_0[17],Location,PIN_C22,Yes
+,GPIO_0[18],Location,PIN_D21,Yes
+,GPIO_0[19],Location,PIN_D22,Yes
+,GPIO_0[20],Location,PIN_E21,Yes
+,GPIO_0[21],Location,PIN_E22,Yes
+,GPIO_0[22],Location,PIN_F21,Yes
+,GPIO_0[23],Location,PIN_F22,Yes
+,GPIO_0[24],Location,PIN_G21,Yes
+,GPIO_0[25],Location,PIN_G22,Yes
+,GPIO_0[26],Location,PIN_J21,Yes
+,GPIO_0[27],Location,PIN_J22,Yes
+,GPIO_0[28],Location,PIN_K21,Yes
+,GPIO_0[29],Location,PIN_K22,Yes
+,GPIO_0[30],Location,PIN_J19,Yes
+,GPIO_0[31],Location,PIN_J20,Yes
+,GPIO_0[32],Location,PIN_J18,Yes
+,GPIO_0[33],Location,PIN_K20,Yes
+,GPIO_0[34],Location,PIN_L19,Yes
+,GPIO_0[35],Location,PIN_L18,Yes
+,GPIO_1[0],Location,PIN_H12,Yes
+,GPIO_1[1],Location,PIN_H13,Yes
+,GPIO_1[2],Location,PIN_H14,Yes
+,GPIO_1[3],Location,PIN_G15,Yes
+,GPIO_1[4],Location,PIN_E14,Yes
+,GPIO_1[5],Location,PIN_E15,Yes
+,GPIO_1[6],Location,PIN_F15,Yes
+,GPIO_1[7],Location,PIN_G16,Yes
+,GPIO_1[8],Location,PIN_F12,Yes
+,GPIO_1[9],Location,PIN_F13,Yes
+,GPIO_1[10],Location,PIN_C14,Yes
+,GPIO_1[11],Location,PIN_D14,Yes
+,GPIO_1[12],Location,PIN_D15,Yes
+,GPIO_1[13],Location,PIN_D16,Yes
+,GPIO_1[14],Location,PIN_C17,Yes
+,GPIO_1[15],Location,PIN_C18,Yes
+,GPIO_1[16],Location,PIN_C19,Yes
+,GPIO_1[17],Location,PIN_C20,Yes
+,GPIO_1[18],Location,PIN_D19,Yes
+,GPIO_1[19],Location,PIN_D20,Yes
+,GPIO_1[20],Location,PIN_E20,Yes
+,GPIO_1[21],Location,PIN_F20,Yes
+,GPIO_1[22],Location,PIN_E19,Yes
+,GPIO_1[23],Location,PIN_E18,Yes
+,GPIO_1[24],Location,PIN_G20,Yes
+,GPIO_1[25],Location,PIN_G18,Yes
+,GPIO_1[26],Location,PIN_G17,Yes
+,GPIO_1[27],Location,PIN_H17,Yes
+,GPIO_1[28],Location,PIN_J15,Yes
+,GPIO_1[29],Location,PIN_H18,Yes
+,GPIO_1[30],Location,PIN_N22,Yes
+,GPIO_1[31],Location,PIN_N21,Yes
+,GPIO_1[32],Location,PIN_P15,Yes
+,GPIO_1[33],Location,PIN_N15,Yes
+,GPIO_1[34],Location,PIN_P17,Yes
+,GPIO_1[35],Location,PIN_P18,Yes
+,GPIO_0[0],I/O Standard,LVTTL,Yes
+,GPIO_0[1],I/O Standard,LVTTL,Yes
+,GPIO_0[2],I/O Standard,LVTTL,Yes
+,GPIO_0[3],I/O Standard,LVTTL,Yes
+,GPIO_0[4],I/O Standard,LVTTL,Yes
+,GPIO_0[5],I/O Standard,LVTTL,Yes
+,GPIO_0[6],I/O Standard,LVTTL,Yes
+,GPIO_0[7],I/O Standard,LVTTL,Yes
+,GPIO_0[8],I/O Standard,LVTTL,Yes
+,GPIO_0[9],I/O Standard,LVTTL,Yes
+,GPIO_0[10],I/O Standard,LVTTL,Yes
+,GPIO_0[11],I/O Standard,LVTTL,Yes
+,GPIO_0[12],I/O Standard,LVTTL,Yes
+,GPIO_0[13],I/O Standard,LVTTL,Yes
+,GPIO_0[14],I/O Standard,LVTTL,Yes
+,GPIO_0[15],I/O Standard,LVTTL,Yes
+,GPIO_0[16],I/O Standard,LVTTL,Yes
+,GPIO_0[17],I/O Standard,LVTTL,Yes
+,GPIO_0[18],I/O Standard,LVTTL,Yes
+,GPIO_0[19],I/O Standard,LVTTL,Yes
+,GPIO_0[20],I/O Standard,LVTTL,Yes
+,GPIO_0[21],I/O Standard,LVTTL,Yes
+,GPIO_0[22],I/O Standard,LVTTL,Yes
+,GPIO_0[23],I/O Standard,LVTTL,Yes
+,GPIO_0[24],I/O Standard,LVTTL,Yes
+,GPIO_0[25],I/O Standard,LVTTL,Yes
+,GPIO_0[26],I/O Standard,LVTTL,Yes
+,GPIO_0[27],I/O Standard,LVTTL,Yes
+,GPIO_0[28],I/O Standard,LVTTL,Yes
+,GPIO_0[29],I/O Standard,LVTTL,Yes
+,GPIO_0[30],I/O Standard,LVTTL,Yes
+,GPIO_0[31],I/O Standard,LVTTL,Yes
+,GPIO_0[32],I/O Standard,LVTTL,Yes
+,GPIO_0[33],I/O Standard,LVTTL,Yes
+,GPIO_0[34],I/O Standard,LVTTL,Yes
+,GPIO_0[35],I/O Standard,LVTTL,Yes
+,GPIO_1[0],I/O Standard,LVTTL,Yes
+,GPIO_1[1],I/O Standard,LVTTL,Yes
+,GPIO_1[2],I/O Standard,LVTTL,Yes
+,GPIO_1[3],I/O Standard,LVTTL,Yes
+,GPIO_1[4],I/O Standard,LVTTL,Yes
+,GPIO_1[5],I/O Standard,LVTTL,Yes
+,GPIO_1[6],I/O Standard,LVTTL,Yes
+,GPIO_1[7],I/O Standard,LVTTL,Yes
+,GPIO_1[8],I/O Standard,LVTTL,Yes
+,GPIO_1[9],I/O Standard,LVTTL,Yes
+,GPIO_1[10],I/O Standard,LVTTL,Yes
+,GPIO_1[11],I/O Standard,LVTTL,Yes
+,GPIO_1[12],I/O Standard,LVTTL,Yes
+,GPIO_1[13],I/O Standard,LVTTL,Yes
+,GPIO_1[14],I/O Standard,LVTTL,Yes
+,GPIO_1[15],I/O Standard,LVTTL,Yes
+,GPIO_1[16],I/O Standard,LVTTL,Yes
+,GPIO_1[17],I/O Standard,LVTTL,Yes
+,GPIO_1[18],I/O Standard,LVTTL,Yes
+,GPIO_1[19],I/O Standard,LVTTL,Yes
+,GPIO_1[20],I/O Standard,LVTTL,Yes
+,GPIO_1[21],I/O Standard,LVTTL,Yes
+,GPIO_1[22],I/O Standard,LVTTL,Yes
+,GPIO_1[23],I/O Standard,LVTTL,Yes
+,GPIO_1[24],I/O Standard,LVTTL,Yes
+,GPIO_1[25],I/O Standard,LVTTL,Yes
+,GPIO_1[26],I/O Standard,LVTTL,Yes
+,GPIO_1[27],I/O Standard,LVTTL,Yes
+,GPIO_1[28],I/O Standard,LVTTL,Yes
+,GPIO_1[29],I/O Standard,LVTTL,Yes
+,GPIO_1[30],I/O Standard,LVTTL,Yes
+,GPIO_1[31],I/O Standard,LVTTL,Yes
+,GPIO_1[32],I/O Standard,LVTTL,Yes
+,GPIO_1[33],I/O Standard,LVTTL,Yes
+,GPIO_1[34],I/O Standard,LVTTL,Yes
+,GPIO_1[35],I/O Standard,LVTTL,Yes
+,SW[0],Location,PIN_L22,Yes
+,SW[1],Location,PIN_L21,Yes
+,SW[2],Location,PIN_M22,Yes
+,SW[3],Location,PIN_V12,Yes
+,SW[4],Location,PIN_W12,Yes
+,SW[5],Location,PIN_U12,Yes
+,SW[6],Location,PIN_U11,Yes
+,SW[7],Location,PIN_M2,Yes
+,SW[8],Location,PIN_M1,Yes
+,SW[9],Location,PIN_L2,Yes
+,SW[0],I/O Standard,LVTTL,Yes
+,SW[1],I/O Standard,LVTTL,Yes
+,SW[2],I/O Standard,LVTTL,Yes
+,SW[3],I/O Standard,LVTTL,Yes
+,SW[4],I/O Standard,LVTTL,Yes
+,SW[5],I/O Standard,LVTTL,Yes
+,SW[6],I/O Standard,LVTTL,Yes
+,SW[7],I/O Standard,LVTTL,Yes
+,SW[8],I/O Standard,LVTTL,Yes
+,SW[9],I/O Standard,LVTTL,Yes
+,HEX0[0],Location,PIN_J2,Yes
+,HEX0[1],Location,PIN_J1,Yes
+,HEX0[2],Location,PIN_H2,Yes
+,HEX0[3],Location,PIN_H1,Yes
+,HEX0[4],Location,PIN_F2,Yes
+,HEX0[5],Location,PIN_F1,Yes
+,HEX0[6],Location,PIN_E2,Yes
+,HEX1[0],Location,PIN_E1,Yes
+,HEX1[1],Location,PIN_H6,Yes
+,HEX1[2],Location,PIN_H5,Yes
+,HEX1[3],Location,PIN_H4,Yes
+,HEX1[4],Location,PIN_G3,Yes
+,HEX1[5],Location,PIN_D2,Yes
+,HEX1[6],Location,PIN_D1,Yes
+,HEX2[0],Location,PIN_G5,Yes
+,HEX2[1],Location,PIN_G6,Yes
+,HEX2[2],Location,PIN_C2,Yes
+,HEX2[3],Location,PIN_C1,Yes
+,HEX2[4],Location,PIN_E3,Yes
+,HEX2[5],Location,PIN_E4,Yes
+,HEX2[6],Location,PIN_D3,Yes
+,HEX3[0],Location,PIN_F4,Yes
+,HEX3[1],Location,PIN_D5,Yes
+,HEX3[2],Location,PIN_D6,Yes
+,HEX3[3],Location,PIN_J4,Yes
+,HEX3[4],Location,PIN_L8,Yes
+,HEX3[5],Location,PIN_F3,Yes
+,HEX3[6],Location,PIN_D4,Yes
+,HEX0[0],I/O Standard,LVTTL,Yes
+,HEX0[1],I/O Standard,LVTTL,Yes
+,HEX0[2],I/O Standard,LVTTL,Yes
+,HEX0[3],I/O Standard,LVTTL,Yes
+,HEX0[4],I/O Standard,LVTTL,Yes
+,HEX0[5],I/O Standard,LVTTL,Yes
+,HEX0[6],I/O Standard,LVTTL,Yes
+,HEX1[0],I/O Standard,LVTTL,Yes
+,HEX1[1],I/O Standard,LVTTL,Yes
+,HEX1[2],I/O Standard,LVTTL,Yes
+,HEX1[3],I/O Standard,LVTTL,Yes
+,HEX1[4],I/O Standard,LVTTL,Yes
+,HEX1[5],I/O Standard,LVTTL,Yes
+,HEX1[6],I/O Standard,LVTTL,Yes
+,HEX2[0],I/O Standard,LVTTL,Yes
+,HEX2[1],I/O Standard,LVTTL,Yes
+,HEX2[2],I/O Standard,LVTTL,Yes
+,HEX2[3],I/O Standard,LVTTL,Yes
+,HEX2[4],I/O Standard,LVTTL,Yes
+,HEX2[5],I/O Standard,LVTTL,Yes
+,HEX2[6],I/O Standard,LVTTL,Yes
+,HEX3[0],I/O Standard,LVTTL,Yes
+,HEX3[1],I/O Standard,LVTTL,Yes
+,HEX3[2],I/O Standard,LVTTL,Yes
+,HEX3[3],I/O Standard,LVTTL,Yes
+,HEX3[4],I/O Standard,LVTTL,Yes
+,HEX3[5],I/O Standard,LVTTL,Yes
+,HEX3[6],I/O Standard,LVTTL,Yes
+,KEY[0],Location,PIN_R22,Yes
+,KEY[1],Location,PIN_R21,Yes
+,KEY[2],Location,PIN_T22,Yes
+,KEY[3],Location,PIN_T21,Yes
+,LEDR[0],Location,PIN_R20,Yes
+,LEDR[1],Location,PIN_R19,Yes
+,LEDR[2],Location,PIN_U19,Yes
+,LEDR[3],Location,PIN_Y19,Yes
+,LEDR[4],Location,PIN_T18,Yes
+,LEDR[5],Location,PIN_V19,Yes
+,LEDR[6],Location,PIN_Y18,Yes
+,LEDR[7],Location,PIN_U18,Yes
+,LEDR[8],Location,PIN_R18,Yes
+,LEDR[9],Location,PIN_R17,Yes
+,LEDG[0],Location,PIN_U22,Yes
+,LEDG[1],Location,PIN_U21,Yes
+,LEDG[2],Location,PIN_V22,Yes
+,LEDG[3],Location,PIN_V21,Yes
+,LEDG[4],Location,PIN_W22,Yes
+,LEDG[5],Location,PIN_W21,Yes
+,LEDG[6],Location,PIN_Y22,Yes
+,LEDG[7],Location,PIN_Y21,Yes
+,KEY[0],I/O Standard,LVTTL,Yes
+,KEY[1],I/O Standard,LVTTL,Yes
+,KEY[2],I/O Standard,LVTTL,Yes
+,KEY[3],I/O Standard,LVTTL,Yes
+,LEDR[0],I/O Standard,LVTTL,Yes
+,LEDR[1],I/O Standard,LVTTL,Yes
+,LEDR[2],I/O Standard,LVTTL,Yes
+,LEDR[3],I/O Standard,LVTTL,Yes
+,LEDR[4],I/O Standard,LVTTL,Yes
+,LEDR[5],I/O Standard,LVTTL,Yes
+,LEDR[6],I/O Standard,LVTTL,Yes
+,LEDR[7],I/O Standard,LVTTL,Yes
+,LEDR[8],I/O Standard,LVTTL,Yes
+,LEDR[9],I/O Standard,LVTTL,Yes
+,LEDG[0],I/O Standard,LVTTL,Yes
+,LEDG[1],I/O Standard,LVTTL,Yes
+,LEDG[2],I/O Standard,LVTTL,Yes
+,LEDG[3],I/O Standard,LVTTL,Yes
+,LEDG[4],I/O Standard,LVTTL,Yes
+,LEDG[5],I/O Standard,LVTTL,Yes
+,LEDG[6],I/O Standard,LVTTL,Yes
+,LEDG[7],I/O Standard,LVTTL,Yes
+,CLOCK_27[0],Location,PIN_D12,Yes
+,CLOCK_27[1],Location,PIN_E12,Yes
+,CLOCK_24[0],Location,PIN_B12,Yes
+,CLOCK_24[1],Location,PIN_A12,Yes
+,CLOCK_50,Location,PIN_L1,Yes
+,EXT_CLOCK,Location,PIN_M21,Yes
+,CLOCK_27[1],I/O Standard,LVTTL,Yes
+,CLOCK_24[0],I/O Standard,LVTTL,Yes
+,CLOCK_24[1],I/O Standard,LVTTL,Yes
+,CLOCK_50,I/O Standard,LVTTL,Yes
+,EXT_CLOCK,I/O Standard,LVTTL,Yes
+,PS2_CLK,Location,PIN_H15,Yes
+,PS2_DAT,Location,PIN_J14,Yes
+,UART_RXD,Location,PIN_F14,Yes
+,UART_TXD,Location,PIN_G12,Yes
+,PS2_CLK,I/O Standard,LVTTL,Yes
+,PS2_DAT,I/O Standard,LVTTL,Yes
+,UART_RXD,I/O Standard,LVTTL,Yes
+,UART_TXD,I/O Standard,LVTTL,Yes
+,TDI,Location,PIN_E8,Yes
+,TCS,Location,PIN_D8,Yes
+,TCK,Location,PIN_C7,Yes
+,TDO,Location,PIN_D7,Yes
+,TDI,I/O Standard,LVTTL,Yes
+,TCS,I/O Standard,LVTTL,Yes
+,TCK,I/O Standard,LVTTL,Yes
+,TDO,I/O Standard,LVTTL,Yes
+,VGA_R[0],Location,PIN_D9,Yes
+,VGA_R[1],Location,PIN_C9,Yes
+,VGA_R[2],Location,PIN_A7,Yes
+,VGA_R[3],Location,PIN_B7,Yes
+,VGA_G[0],Location,PIN_B8,Yes
+,VGA_G[1],Location,PIN_C10,Yes
+,VGA_G[2],Location,PIN_B9,Yes
+,VGA_G[3],Location,PIN_A8,Yes
+,VGA_B[0],Location,PIN_A9,Yes
+,VGA_B[1],Location,PIN_D11,Yes
+,VGA_B[2],Location,PIN_A10,Yes
+,VGA_B[3],Location,PIN_B10,Yes
+,VGA_HS,Location,PIN_A11,Yes
+,VGA_VS,Location,PIN_B11,Yes
+,VGA_R[0],I/O Standard,LVTTL,Yes
+,VGA_R[1],I/O Standard,LVTTL,Yes
+,VGA_R[2],I/O Standard,LVTTL,Yes
+,VGA_R[3],I/O Standard,LVTTL,Yes
+,VGA_G[0],I/O Standard,LVTTL,Yes
+,VGA_G[1],I/O Standard,LVTTL,Yes
+,VGA_G[2],I/O Standard,LVTTL,Yes
+,VGA_G[3],I/O Standard,LVTTL,Yes
+,VGA_B[0],I/O Standard,LVTTL,Yes
+,VGA_B[1],I/O Standard,LVTTL,Yes
+,VGA_B[2],I/O Standard,LVTTL,Yes
+,VGA_B[3],I/O Standard,LVTTL,Yes
+,VGA_HS,I/O Standard,LVTTL,Yes
+,VGA_VS,I/O Standard,LVTTL,Yes
+,I2C_SCLK,Location,PIN_A3,Yes
+,I2C_SDAT,Location,PIN_B3,Yes
+,AUD_ADCLRCK,Location,PIN_A6,Yes
+,AUD_ADCDAT,Location,PIN_B6,Yes
+,AUD_DACLRCK,Location,PIN_A5,Yes
+,AUD_DACDAT,Location,PIN_B5,Yes
+,AUD_XCK,Location,PIN_B4,Yes
+,AUD_BCLK,Location,PIN_A4,Yes
+,I2C_SCLK,I/O Standard,LVTTL,Yes
+,I2C_SDAT,I/O Standard,LVTTL,Yes
+,AUD_ADCLRCK,I/O Standard,LVTTL,Yes
+,AUD_ADCDAT,I/O Standard,LVTTL,Yes
+,AUD_DACLRCK,I/O Standard,LVTTL,Yes
+,AUD_DACDAT,I/O Standard,LVTTL,Yes
+,AUD_XCK,I/O Standard,LVTTL,Yes
+,AUD_BCLK,I/O Standard,LVTTL,Yes
+,DRAM_ADDR[0],Location,PIN_W4,Yes
+,DRAM_ADDR[1],Location,PIN_W5,Yes
+,DRAM_ADDR[2],Location,PIN_Y3,Yes
+,DRAM_ADDR[3],Location,PIN_Y4,Yes
+,DRAM_ADDR[4],Location,PIN_R6,Yes
+,DRAM_ADDR[5],Location,PIN_R5,Yes
+,DRAM_ADDR[6],Location,PIN_P6,Yes
+,DRAM_ADDR[7],Location,PIN_P5,Yes
+,DRAM_ADDR[8],Location,PIN_P3,Yes
+,DRAM_ADDR[9],Location,PIN_N4,Yes
+,DRAM_ADDR[10],Location,PIN_W3,Yes
+,DRAM_ADDR[11],Location,PIN_N6,Yes
+,DRAM_BA_0,Location,PIN_U3,Yes
+,DRAM_BA_1,Location,PIN_V4,Yes
+,DRAM_CAS_N,Location,PIN_T3,Yes
+,DRAM_CKE,Location,PIN_N3,Yes
+,DRAM_CLK,Location,PIN_U4,Yes
+,DRAM_CS_N,Location,PIN_T6,Yes
+,DRAM_DQ[0],Location,PIN_U1,Yes
+,DRAM_DQ[1],Location,PIN_U2,Yes
+,DRAM_DQ[2],Location,PIN_V1,Yes
+,DRAM_DQ[3],Location,PIN_V2,Yes
+,DRAM_DQ[4],Location,PIN_W1,Yes
+,DRAM_DQ[5],Location,PIN_W2,Yes
+,DRAM_DQ[6],Location,PIN_Y1,Yes
+,DRAM_DQ[7],Location,PIN_Y2,Yes
+,DRAM_DQ[8],Location,PIN_N1,Yes
+,DRAM_DQ[9],Location,PIN_N2,Yes
+,DRAM_DQ[10],Location,PIN_P1,Yes
+,DRAM_DQ[11],Location,PIN_P2,Yes
+,DRAM_DQ[12],Location,PIN_R1,Yes
+,DRAM_DQ[13],Location,PIN_R2,Yes
+,DRAM_DQ[14],Location,PIN_T1,Yes
+,DRAM_DQ[15],Location,PIN_T2,Yes
+,DRAM_LDQM,Location,PIN_R7,Yes
+,DRAM_RAS_N,Location,PIN_T5,Yes
+,DRAM_UDQM,Location,PIN_M5,Yes
+,DRAM_WE_N,Location,PIN_R8,Yes
+,FL_ADDR[0],Location,PIN_AB20,Yes
+,FL_ADDR[1],Location,PIN_AA14,Yes
+,FL_ADDR[2],Location,PIN_Y16,Yes
+,FL_ADDR[3],Location,PIN_R15,Yes
+,FL_ADDR[4],Location,PIN_T15,Yes
+,FL_ADDR[5],Location,PIN_U15,Yes
+,FL_ADDR[6],Location,PIN_V15,Yes
+,FL_ADDR[7],Location,PIN_W15,Yes
+,FL_ADDR[8],Location,PIN_R14,Yes
+,FL_ADDR[9],Location,PIN_Y13,Yes
+,FL_ADDR[10],Location,PIN_R12,Yes
+,FL_ADDR[11],Location,PIN_T12,Yes
+,FL_ADDR[12],Location,PIN_AB14,Yes
+,FL_ADDR[13],Location,PIN_AA13,Yes
+,FL_ADDR[14],Location,PIN_AB13,Yes
+,FL_ADDR[15],Location,PIN_AA12,Yes
+,FL_ADDR[16],Location,PIN_AB12,Yes
+,FL_ADDR[17],Location,PIN_AA20,Yes
+,FL_ADDR[18],Location,PIN_U14,Yes
+,FL_ADDR[19],Location,PIN_V14,Yes
+,FL_ADDR[20],Location,PIN_U13,Yes
+,FL_ADDR[21],Location,PIN_R13,Yes
+,FL_DQ[0],Location,PIN_AB16,Yes
+,FL_DQ[1],Location,PIN_AA16,Yes
+,FL_DQ[2],Location,PIN_AB17,Yes
+,FL_DQ[3],Location,PIN_AA17,Yes
+,FL_DQ[4],Location,PIN_AB18,Yes
+,FL_DQ[5],Location,PIN_AA18,Yes
+,FL_DQ[6],Location,PIN_AB19,Yes
+,FL_DQ[7],Location,PIN_AA19,Yes
+,FL_OE_N,Location,PIN_AA15,Yes
+,FL_RST_N,Location,PIN_W14,Yes
+,FL_WE_N,Location,PIN_Y14,Yes
+,SRAM_ADDR[0],Location,PIN_AA3,Yes
+,SRAM_ADDR[1],Location,PIN_AB3,Yes
+,SRAM_ADDR[2],Location,PIN_AA4,Yes
+,SRAM_ADDR[3],Location,PIN_AB4,Yes
+,SRAM_ADDR[4],Location,PIN_AA5,Yes
+,SRAM_ADDR[5],Location,PIN_AB10,Yes
+,SRAM_ADDR[6],Location,PIN_AA11,Yes
+,SRAM_ADDR[7],Location,PIN_AB11,Yes
+,SRAM_ADDR[8],Location,PIN_V11,Yes
+,SRAM_ADDR[9],Location,PIN_W11,Yes
+,SRAM_ADDR[10],Location,PIN_R11,Yes
+,SRAM_ADDR[11],Location,PIN_T11,Yes
+,SRAM_ADDR[12],Location,PIN_Y10,Yes
+,SRAM_ADDR[13],Location,PIN_U10,Yes
+,SRAM_ADDR[14],Location,PIN_R10,Yes
+,SRAM_ADDR[15],Location,PIN_T7,Yes
+,SRAM_ADDR[16],Location,PIN_Y6,Yes
+,SRAM_ADDR[17],Location,PIN_Y5,Yes
+,SRAM_CE_N,Location,PIN_AB5,Yes
+,SRAM_DQ[0],Location,PIN_AA6,Yes
+,SRAM_DQ[1],Location,PIN_AB6,Yes
+,SRAM_DQ[2],Location,PIN_AA7,Yes
+,SRAM_DQ[3],Location,PIN_AB7,Yes
+,SRAM_DQ[4],Location,PIN_AA8,Yes
+,SRAM_DQ[5],Location,PIN_AB8,Yes
+,SRAM_DQ[6],Location,PIN_AA9,Yes
+,SRAM_DQ[7],Location,PIN_AB9,Yes
+,SRAM_DQ[8],Location,PIN_Y9,Yes
+,SRAM_DQ[9],Location,PIN_W9,Yes
+,SRAM_DQ[10],Location,PIN_V9,Yes
+,SRAM_DQ[11],Location,PIN_U9,Yes
+,SRAM_DQ[12],Location,PIN_R9,Yes
+,SRAM_DQ[13],Location,PIN_W8,Yes
+,SRAM_DQ[14],Location,PIN_V8,Yes
+,SRAM_DQ[15],Location,PIN_U8,Yes
+,SRAM_LB_N,Location,PIN_Y7,Yes
+,SRAM_OE_N,Location,PIN_T8,Yes
+,SRAM_UB_N,Location,PIN_W7,Yes
+,SRAM_WE_N,Location,PIN_AA10,Yes

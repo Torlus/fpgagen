@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 29
+/svn/!svn/ver/2/trunk/src/T80
+END
+T80_RegX.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/2/trunk/src/T80/T80_RegX.vhd
+END
+T80_MCode.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/2/trunk/src/T80/T80_MCode.vhd
+END
+T80se.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/2/trunk/src/T80/T80se.vhd
+END
+T80sed.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/2/trunk/src/T80/T80sed.vhd
+END
+T80_Reg.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/2/trunk/src/T80/T80_Reg.vhd
+END
+T80_Pack.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/2/trunk/src/T80/T80_Pack.vhd
+END
+T80.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/2/trunk/src/T80/T80.vhd
+END
+T8080se.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/2/trunk/src/T80/T8080se.vhd
+END
+T80a.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/2/trunk/src/T80/T80a.vhd
+END
+T80_ALU.vhd
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/2/trunk/src/T80/T80_ALU.vhd
+END
