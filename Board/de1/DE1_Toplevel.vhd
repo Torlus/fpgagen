@@ -40,7 +40,7 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.STD_LOGIC_TEXTIO.all;
 
-entity gen_top is
+entity DE1_Toplevel is
 	port(
 		SW			: in std_logic_vector(9 downto 0);
 		
@@ -89,13 +89,14 @@ entity gen_top is
 		VGA_VS		: out std_logic;
 		VGA_HS		: out std_logic				
 	);
-end gen_top;
+end DE1_Toplevel;
 
-architecture rtl of gen_top is
+architecture rtl of DE1_Toplevel is
 
 signal NO_DATA		: std_logic_vector(15 downto 0) := x"4E71";	-- SYNTHESIS gp/m68k.c line 12
 
 signal MCLK			: std_logic;
+signal CLK_LOCKED	: std_logic;
 
 -- 68K
 signal TG68_CLK		: std_logic;
@@ -392,9 +393,10 @@ begin
 pll : entity work.pll
 port map(
 	inclk0	=> CLOCK_27(0),
-	c0		=> MCLK,
-	c1		=> DRAM_CLK,
-	c2		=> open
+	c0			=> MCLK,
+	c1			=> DRAM_CLK,
+	c2			=> open,
+	locked	=> CLK_LOCKED
 );
 
 -- DEBUG

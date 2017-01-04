@@ -123,7 +123,7 @@ port map(
 	DRAM_WE_N	=> DRAM_WE_N
 );
 
-gen : entity work.gen_top
+gen : entity work.DE1_Toplevel
 port map(
 	SW			=> SW,
 		
