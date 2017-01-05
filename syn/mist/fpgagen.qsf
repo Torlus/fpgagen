@@ -271,6 +271,8 @@ set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
 
 
 
+set_global_assignment -name VHDL_FILE ../../src/virtual_toplevel.vhd
+set_global_assignment -name VHDL_FILE ../../src/video_vga_dither.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80se.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80_Reg.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80_Pack.vhd
@@ -301,8 +303,6 @@ set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/simple_uart.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/io_ps2_com.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/interrupt_controller.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/CtrlModule.vhd
-set_global_assignment -name VHDL_FILE ../../src/virtual_toplevel.vhd
-set_global_assignment -name VHDL_FILE ../../src/video_vga_dither.vhd
 set_global_assignment -name VHDL_FILE ../../ZPUFlex/RTL/zpupkg.vhd
 set_global_assignment -name VHDL_FILE ../../ZPUFlex/RTL/zpu_core_flex.vhd
 set_global_assignment -name VHDL_FILE ../../Firmware/CtrlROM/CtrlROM_ROM.vhd
