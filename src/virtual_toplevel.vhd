@@ -70,9 +70,9 @@ constant addrwidth : integer := rowAddrBits+colAddrBits+2;
 -- "FLASH"
 signal romrd_req : std_logic := '0';
 signal romrd_ack : std_logic;
-signal romrd_a : std_logic_vector((13+9+2) downto 3);
+signal romrd_a : std_logic_vector(addrwidth downto 3);
 signal romrd_q : std_logic_vector(63 downto 0);
-signal romrd_a_cached : std_logic_vector((13+9+2) downto 3);
+signal romrd_a_cached : std_logic_vector(addrwidth downto 3);
 signal romrd_q_cached : std_logic_vector(63 downto 0);
 type fc_t is ( FC_IDLE, 
 	FC_TG68_RD,
@@ -85,7 +85,7 @@ signal FC : fc_t;
 signal ram68k_req : std_logic;
 signal ram68k_ack : std_logic;
 signal ram68k_we : std_logic;
-signal ram68k_a : std_logic_vector((13+9+2) downto 1);
+signal ram68k_a : std_logic_vector(addrwidth downto 1);
 signal ram68k_d : std_logic_vector(15 downto 0);
 signal ram68k_q : std_logic_vector(15 downto 0);
 signal ram68k_l_n : std_logic;
@@ -95,7 +95,7 @@ signal ram68k_u_n : std_logic;
 signal vram_req : std_logic;
 signal vram_ack : std_logic;
 signal vram_we : std_logic;
-signal vram_a : std_logic_vector((13+9+2) downto 1);
+signal vram_a : std_logic_vector(addrwidth downto 1);
 signal vram_d : std_logic_vector(15 downto 0);
 signal vram_q : std_logic_vector(15 downto 0);
 signal vram_l_n : std_logic;
@@ -705,10 +705,13 @@ multitap <= SW(4);
 --);
 
 -- -----------------------------------------------------------------------
--- Clocks and PLL
+-- Global assignments
 -- -----------------------------------------------------------------------
+DRAM_CKE <= '1';
+DRAM_CS_N <= '0';
 MCLK <= CLK;
 MRST_N <= '1';
+
 
 -- -----------------------------------------------------------------------
 -- SDRAM Controller
@@ -2336,11 +2339,7 @@ end process;
 -- synthesis translate_on
 
 ------------------------ END ----------------------
-
 -- COMMENTED START
---DRAM_CKE <= '1';
---DRAM_CS_N <= '0';
---
 ---- Interrupt signals
 --CPU_NMI_N <= '1';
 --CPU_IRQ1_N <= VDC_IRQ_N;
