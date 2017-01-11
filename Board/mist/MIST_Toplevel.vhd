@@ -234,11 +234,11 @@ begin
 
   U00 : entity work.pll
     port map(
-      inclk0 => CLOCK_27(0),       -- 27 MHz external
-      c0     => MCLK,         -- 54MHz internal
+      inclk0 => CLOCK_27(0),	-- 27 MHz external
+      c0     => MCLK,			-- 54MHz internal
 		c1     => open,
-      c2     => memclk,         -- 108Mhz
-      c3     => SDRAM_CLK,        -- 108Mhz external
+      c2     => memclk,			-- 108Mhz
+      c3     => SDRAM_CLK,		-- 108Mhz external
 		locked => pll_locked
     );
 
@@ -268,7 +268,7 @@ end process;
 virtualtoplevel : entity work.Virtual_Toplevel
 	port map(
 		reset => reset,
-		CLK => MCLK,
+		MCLK => MCLK,
 		SDR_CLK => memclk,
 
     -- SDRAM DE1 ports

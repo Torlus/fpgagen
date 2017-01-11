@@ -18,7 +18,7 @@ entity Virtual_Toplevel is
 	);
 	port(
 		reset : in std_logic;
-		CLK : in std_logic;
+		MCLK : in std_logic;
 		SDR_CLK : in std_logic;
 
 		DRAM_ADDR	: out std_logic_vector(rowAddrBits-1 downto 0);
@@ -138,7 +138,6 @@ constant useCache : boolean := false;
 -- Genesis core
 signal NO_DATA		: std_logic_vector(15 downto 0) := x"4E71";	-- SYNTHESIS gp/m68k.c line 12
 
-signal MCLK			: std_logic;
 signal MRST_N		: std_logic;
 
 -- 68K
@@ -711,9 +710,8 @@ multitap <= SW(4);
 -- -----------------------------------------------------------------------
 DRAM_CKE <= '1';
 DRAM_CS_N <= '0';
-MCLK <= CLK;
 MRST_N <= PRE_RESET_N and ROM_RESET_N;
-LED <= MRST_N;
+LED <= CART_EN;
 
 -- -----------------------------------------------------------------------
 -- SDRAM Controller
@@ -2598,9 +2596,9 @@ CPU_IO_DI(3 downto 0) <=
 		
 	else "1111";
 
-process(clk)
+process(MCLK)
 begin
-	if rising_edge(clk) then
+	if rising_edge(MCLK) then
 		if CPU_IO_DO(1)='1' then -- reset pad
 			gamepad_port<=(others => '0');
 		elsif prev_sel='0' and CPU_IO_DO(0)='1' and multitap='1' then -- Rising edge of select bit
