@@ -41,6 +41,8 @@ entity Virtual_Toplevel is
 		VGA_B		: out std_logic_vector(7 downto 0);
 		VGA_VS		: out std_logic;
 		VGA_HS		: out std_logic;
+		
+		LED : out std_logic;
 
 		RS232_RXD : in std_logic;
 		RS232_TXD : out std_logic;
@@ -710,8 +712,8 @@ multitap <= SW(4);
 DRAM_CKE <= '1';
 DRAM_CS_N <= '0';
 MCLK <= CLK;
-MRST_N <= '1';
-
+MRST_N <= PRE_RESET_N and ROM_RESET_N;
+LED <= MRST_N;
 
 -- -----------------------------------------------------------------------
 -- SDRAM Controller

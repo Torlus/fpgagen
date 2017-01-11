@@ -311,6 +311,8 @@ virtualtoplevel : entity work.Virtual_Toplevel
 
     VGA_HS => VGA_HS,
     VGA_VS => VGA_VS,
+	 
+	 LED => LED,
 
 	 DAC_LDATA => audiol,
 	 DAC_RDATA => audior,
@@ -359,7 +361,7 @@ sd_card_d: component sd_card
 	);
 
 -- prevent joystick signals from being optimzed away
-LED <= '0' when ((joy_ana_0 /= joy_ana_1) AND (joy_0 /= joy_1)) else '1';
+--LED <= '0' when ((joy_ana_0 /= joy_ana_1) AND (joy_0 /= joy_1)) else '1';
 	
 user_io_d : user_io
     generic map (STRLEN => 1)
