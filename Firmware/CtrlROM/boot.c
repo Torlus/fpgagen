@@ -123,10 +123,10 @@ static int LoadROM(const char *filename)
 				for(i=0;i<512;i+=4)
 				{
 					unsigned int t=*p++;  // AABBCCDD
-					unsigned int t1=((t&0xff00)>>8)|((t&0xff)<<8); // DDCC
-					unsigned int t2=((t&0xff000000)>>24)|((t&0xff0000)>>8);  // BBAA
-					HW_HOST(HW_HOST_BOOTDATA)=t2; // BBAA
-					HW_HOST(HW_HOST_BOOTDATA)=t1; // DDCC
+					unsigned int t1=t&0xffff;  // CCDD  // ((t&0xff00)>>8)|((t&0xff)<<8); // DDCC
+					unsigned int t2=(t>>16); // AABB  // ((t&0xff000000)>>24)|((t&0xff0000)>>8);  // BBAA
+					HW_HOST(HW_HOST_BOOTDATA)=t2; // AABB  // BBAA
+					HW_HOST(HW_HOST_BOOTDATA)=t1; // CCDD  // DDCC
 				}
 			}
 			else
@@ -392,10 +392,6 @@ int main(int argc,char **argv)
 	int i;
 	multitap=1;
 	SetDIPSwitch(DEFAULT_DIPSWITCH_SETTINGS);
-	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Put core into Reset
-	HW_HOST(HW_HOST_SW)=DEFAULT_DIPSWITCH_SETTINGS;
-	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD;	// Release reset but steal SD card
-	HW_HOST(HW_HOST_MOUSEBUTTONS)=3;
 
 	PS2Init();
 	EnableInterrupts();
@@ -406,6 +402,11 @@ int main(int argc,char **argv)
 	PS2Wait();
 	PS2Wait();
 	OSD_Show(1);	// OSD should now show correctly.
+
+	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Put core into Reset
+	HW_HOST(HW_HOST_SW)=DEFAULT_DIPSWITCH_SETTINGS;
+	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD;	// Release reset but steal SD card
+	HW_HOST(HW_HOST_MOUSEBUTTONS)=3;
 
 	OSD_Puts("Initializing SD card\n");
 	i=5;
