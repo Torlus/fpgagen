@@ -1,3 +1,10 @@
+IMPORTANT:
+IMPORTANT: You need to push a the keyboard a few times in order to the core to complete it's boot process.
+Then press F12 for the OSD to appear!
+IMPORTANT:
+
+
+
 ================================================================================
 fpgagen - a SEGA Megadrive/Genesis clone in a FPGA.
 Copyright (c) 2010-2013 Gregory Estrade (greg@torlus.com)
