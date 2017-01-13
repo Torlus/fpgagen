@@ -1,8 +1,12 @@
 IMPORTANT:
-IMPORTANT: You need to push a the keyboard a few times in order to the core to complete it's boot process.
+IMPORTANT: You need to push a the keyboard a few times in order for the core to complete it's boot process.
 Then press F12 for the OSD to appear!
 IMPORTANT:
+IMPORTANT:
 
+Next tasks:
+Send sync signals during reset so there is no need to press keys for the core to boot
+React on input
 
 
 ================================================================================
