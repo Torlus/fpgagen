@@ -51,6 +51,8 @@ entity gen_io is
 		P1_B		: in std_logic;
 		P1_C		: in std_logic;
 		P1_START	: in std_logic;		
+
+		-- GPIO_1		: inout std_logic_vector(35 downto 0);
 		
 		SEL			: in std_logic;
 		A			: in std_logic_vector(4 downto 0);
@@ -88,6 +90,10 @@ signal RD		: std_logic_vector(7 downto 0);
 
 
 begin
+
+-- GPIO_1(35 downto 6) <= (others => 'Z');
+-- GPIO_1(4 downto 0) <= (others => 'Z');
+-- GPIO_1(5) <= DATA(6);
 
 DO <= RD & RD;
 DTACK_N <= FF_DTACK_N;
@@ -207,6 +213,13 @@ begin
 						if CTLA(1) = '0' then RD(1) <= P1_DOWN; end if;
 						if CTLA(0) = '0' then RD(0) <= P1_UP; end if;					
 					end if;
+					-- if CTLA(5) = '0' then RD(5) <= GPIO_1(6); end if;
+					-- if CTLA(4) = '0' then RD(4) <= GPIO_1(4); end if;
+					-- if CTLA(3) = '0' then RD(3) <= GPIO_1(2); end if;
+					-- if CTLA(2) = '0' then RD(2) <= GPIO_1(3); end if;
+					-- if CTLA(1) = '0' then RD(1) <= GPIO_1(1); end if;
+					-- if CTLA(0) = '0' then RD(0) <= GPIO_1(0); end if;
+					
 				when x"2" => -- Unconnected port
 					RD <= DATB;
 					if CTLB(6) = '0' then RD(6) <= '1'; end if;

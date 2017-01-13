@@ -323,6 +323,16 @@ signal VBUS_DATA	: std_logic_vector(15 downto 0);
 signal VBUS_SEL		: std_logic;
 signal VBUS_DTACK_N	: std_logic;
 
+
+signal P1_UP		: std_logic;
+signal P1_DOWN		: std_logic;
+signal P1_LEFT		: std_logic;
+signal P1_RIGHT		: std_logic;
+signal P1_A			: std_logic;
+signal P1_B			: std_logic;
+signal P1_C			: std_logic;
+signal P1_START		: std_logic;	
+
 -- DEBUG
 signal HEXVALUE			: std_logic_vector(15 downto 0);
 
@@ -835,6 +845,33 @@ port map(
 	D			=> TG68_OS_D
 );
 
+-- I/O
+io : entity work.gen_io
+port map(
+	RST_N		=> MRST_N,
+	CLK			=> VCLK,
+
+	P1_UP		=> P1_UP,
+	P1_DOWN		=> P1_DOWN,
+	P1_LEFT		=> P1_LEFT,
+	P1_RIGHT	=> P1_RIGHT,
+	P1_A		=> P1_A,
+	P1_B		=> P1_B,
+	P1_C		=> P1_C,
+	P1_START	=> P1_START,
+		
+	-- GPIO_1		=> GPIO_1,
+		
+	SEL			=> IO_SEL,
+	A			=> IO_A,
+	RNW			=> IO_RNW,
+	UDS_N		=> IO_UDS_N,
+	LDS_N		=> IO_LDS_N,
+	DI			=> IO_DI,
+	DO			=> IO_DO,
+	DTACK_N		=> IO_DTACK_N
+);
+
 -- VDP
 vdp : entity work.vdp
 port map(
@@ -899,6 +936,28 @@ port map(
 	DO			=> FM_DO,
 	DTACK_N	=> FM_DTACK_N
 );
+
+-- #############################################################################
+-- #############################################################################
+-- #############################################################################
+
+-- UNUSED SIGNALS
+-- VBUS_DMA_ACK <= '0';
+-- VRAM_DTACK_N <= '0';
+
+----------------------------------------------------------------
+-- INPUTS
+----------------------------------------------------------------
+
+P1_UP		<= '1';
+P1_DOWN		<= '1';
+P1_LEFT		<= '1';
+P1_RIGHT	<= '1';
+
+P1_A		<= '1';
+P1_B		<= '1';
+P1_C		<= '1';
+P1_START	<= '1';
 
 ----------------------------------------------------------------
 -- INTERRUPTS CONTROL

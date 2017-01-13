@@ -285,6 +285,7 @@ set_global_assignment -name VHDL_FILE ../../src/vdp_common.vhd
 set_global_assignment -name VHDL_FILE ../../src/vdp.vhd
 set_global_assignment -name VHDL_FILE ../../src/sdram_controller.vhd
 set_global_assignment -name VHDL_FILE ../../src/os_rom.vhd
+set_global_assignment -name VHDL_FILE ../../src/gen_io.vhd
 set_global_assignment -name VHDL_FILE ../../src/gen_fm.vhd
 set_global_assignment -name VHDL_FILE ../../src/chameleon_gen_sdram.vhd
 set_global_assignment -name VHDL_FILE ../../src/vdp_colinfo.vhd
