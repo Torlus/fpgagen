@@ -54,9 +54,6 @@ entity Virtual_Toplevel is
 		
 		joya : in std_logic_vector(7 downto 0) := (others =>'1');
 		joyb : in std_logic_vector(7 downto 0) := (others =>'1');
-		joyc : in std_logic_vector(7 downto 0) := (others =>'1');
-		joyd : in std_logic_vector(7 downto 0) := (others =>'1');
-		joye : in std_logic_vector(7 downto 0) := (others =>'1');
 
 		spi_miso		: in std_logic := '1';
 		spi_mosi		: out std_logic;
@@ -851,14 +848,14 @@ port map(
 	RST_N		=> MRST_N,
 	CLK			=> VCLK,
 
-	P1_UP		=> P1_UP,
-	P1_DOWN		=> P1_DOWN,
-	P1_LEFT		=> P1_LEFT,
-	P1_RIGHT	=> P1_RIGHT,
-	P1_A		=> P1_A,
-	P1_B		=> P1_B,
-	P1_C		=> P1_C,
-	P1_START	=> P1_START,
+	P1_UP		=> not joya(3),
+	P1_DOWN	=> not joya(2),
+	P1_LEFT	=> not joya(1),
+	P1_RIGHT	=> not joya(0),
+	P1_A		=> not joya(4),
+	P1_B		=> not joya(5),
+	P1_C		=> not joya(6),
+	P1_START	=> not joya(7),
 		
 	-- GPIO_1		=> GPIO_1,
 		
@@ -2607,66 +2604,66 @@ end process;
 
 
 
--- Block RAM
-RAM_A <= CPU_A(12 downto 0);
-RAM_DI <= CPU_DO;
-process( MCLK )
-begin
-	if rising_edge( MCLK ) then
-		RAM_WE <= '0';
-		if CPU_CLKOUT = '1' and CPU_RAM_SEL_N = '0' and CPU_WR_N = '0' then
-			RAM_WE <= '1';
-		end if;
-	end if;
-end process;
-
-joya_merged <= joya and gp1emu;
-joyb_merged <= joyb and gp2emu;
-
-
-
--- I/O Port
-CPU_IO_DI(7 downto 4) <= "1011"; -- No CD-Rom unit, TGFX-16
-CPU_IO_DI(3 downto 0) <=
-	joya_merged(7) & joya_merged(6) & joya_merged(4) & joya_merged(5)
-		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "000"
-	else joya_merged(2) & joya_merged(1) & joya_merged(3) & joya_merged(0)
-		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "000"
-		
-	else joyb_merged(7) & joyb_merged(6) & joyb_merged(4) & joyb_merged(5)
-		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "001"
-	else joyb_merged(2) & joyb_merged(1) & joyb_merged(3) & joyb_merged(0)
-		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "001"
-		
-	else joyc(7) & joyc(6) & joyc(4) & joyc(5)
-		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "010"
-	else joyc(2) & joyc(1) & joyc(3) & joyc(0)
-		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "010"
-		
-	else joyd(7) & joyd(6) & joyd(4) & joyd(5)
-		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "011"
-	else joyd(2) & joyd(1) & joyd(3) & joyd(0)
-		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "011"
-
-	else joye(7) & joye(6) & joye(4) & joye(5)
-		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "100"
-	else joye(2) & joye(1) & joye(3) & joye(0)
-		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "100"
-		
-	else "1111";
-
-process(MCLK)
-begin
-	if rising_edge(MCLK) then
-		if CPU_IO_DO(1)='1' then -- reset pad
-			gamepad_port<=(others => '0');
-		elsif prev_sel='0' and CPU_IO_DO(0)='1' and multitap='1' then -- Rising edge of select bit
-			gamepad_port<=gamepad_port+1;
-		end if;
-		prev_sel<=CPU_IO_DO(0);
-	end if;
-
-end process;
+---- Block RAM
+--RAM_A <= CPU_A(12 downto 0);
+--RAM_DI <= CPU_DO;
+--process( MCLK )
+--begin
+--	if rising_edge( MCLK ) then
+--		RAM_WE <= '0';
+--		if CPU_CLKOUT = '1' and CPU_RAM_SEL_N = '0' and CPU_WR_N = '0' then
+--			RAM_WE <= '1';
+--		end if;
+--	end if;
+--end process;
+--
+--joya_merged <= joya and gp1emu;
+--joyb_merged <= joyb and gp2emu;
+--
+--
+--
+---- I/O Port
+--CPU_IO_DI(7 downto 4) <= "1011"; -- No CD-Rom unit, TGFX-16
+--CPU_IO_DI(3 downto 0) <=
+--	joya_merged(7) & joya_merged(6) & joya_merged(4) & joya_merged(5)
+--		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "000"
+--	else joya_merged(2) & joya_merged(1) & joya_merged(3) & joya_merged(0)
+--		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "000"
+--		
+--	else joyb_merged(7) & joyb_merged(6) & joyb_merged(4) & joyb_merged(5)
+--		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "001"
+--	else joyb_merged(2) & joyb_merged(1) & joyb_merged(3) & joyb_merged(0)
+--		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "001"
+--		
+--	else joyc(7) & joyc(6) & joyc(4) & joyc(5)
+--		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "010"
+--	else joyc(2) & joyc(1) & joyc(3) & joyc(0)
+--		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "010"
+--		
+--	else joyd(7) & joyd(6) & joyd(4) & joyd(5)
+--		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "011"
+--	else joyd(2) & joyd(1) & joyd(3) & joyd(0)
+--		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "011"
+--
+--	else joye(7) & joye(6) & joye(4) & joye(5)
+--		when CPU_IO_DO(1 downto 0) = "00" and gamepad_port = "100"
+--	else joye(2) & joye(1) & joye(3) & joye(0)
+--		when CPU_IO_DO(1 downto 0) = "01" and gamepad_port = "100"
+--		
+--	else "1111";
+--
+--process(MCLK)
+--begin
+--	if rising_edge(MCLK) then
+--		if CPU_IO_DO(1)='1' then -- reset pad
+--			gamepad_port<=(others => '0');
+--		elsif prev_sel='0' and CPU_IO_DO(0)='1' and multitap='1' then -- Rising edge of select bit
+--			gamepad_port<=gamepad_port+1;
+--		end if;
+--		prev_sel<=CPU_IO_DO(0);
+--	end if;
+--
+--end process;
 	
 -- Control module:
 

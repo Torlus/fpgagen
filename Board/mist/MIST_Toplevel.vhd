@@ -292,11 +292,8 @@ virtualtoplevel : entity work.Virtual_Toplevel
 	 ps2k_dat_in => ps2_keyboard_dat_in,
  
 --    -- Joystick ports (Port_A, Port_B)
-	joya => joyn_0,
-	joyb => joyn_1,
-	joyc => joyn_2,
-	joyd => joyn_3,
-	joye => joyn_4,
+	joya => joy_1,
+	joyb => joy_0,
 
     -- SD/MMC slot ports
 	spi_clk => sd_sck,
