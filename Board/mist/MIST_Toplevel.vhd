@@ -214,10 +214,10 @@ begin
   U00 : entity work.pll
     port map(
       inclk0 => CLOCK_27(0),	-- 27 MHz external
-      c0     => MCLK,			-- 54MHz internal
+      c0     => MCLK,			-- 54 MHz internal
 		c1     => open,
-      c2     => memclk,			-- 108Mhz
-      c3     => SDRAM_CLK,		-- 108Mhz external
+      c2     => memclk,			-- 108 Mhz
+      c3     => SDRAM_CLK,		-- 108 Mhz external
 		locked => pll_locked
     );
 

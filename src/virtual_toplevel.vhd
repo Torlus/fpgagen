@@ -42,8 +42,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 
 entity Virtual_Toplevel is
-	generic
-	(
+	generic (
 		colAddrBits : integer := 9;
 		rowAddrBits : integer := 13
 	);
@@ -450,7 +449,10 @@ LED <= CART_EN;
 -- -----------------------------------------------------------------------
 -- SDRAM Controller
 -- -----------------------------------------------------------------------		
-sdc : entity work.sdram_controller port map(
+sdc : entity work.sdram_controller generic map (
+	colAddrBits => colAddrBits,
+	rowAddrBits => rowAddrBits
+) port map(
 	clk			=> SDR_CLK,
 	
 	std_logic_vector(sd_data)	=> DRAM_DQ,
