@@ -49,7 +49,7 @@ void WaitEnter()
 
 void LoadSettings()
 {
-	if(FileOpen(&file,"FPGAPCE CFG"))	// Do we have a configuration file?
+	if(FileOpen(&file,"FPGAGEN CFG"))	// Do we have a configuration file?
 	{
 		FileRead(&file,sector_buffer);
 		dipswitch=*(int *)(&sector_buffer[0]);
@@ -62,7 +62,7 @@ void LoadSettings()
 void SaveSettings(int row)
 {
 	ChangeDirectory(0);
-	if(FileOpen(&file,"FPGAPCE CFG"))	// Do we have a configuration file?
+	if(FileOpen(&file,"FPGAGEN CFG"))	// Do we have a configuration file?
 	{
 		int i;
 		int *p=(int *)sector_buffer;
@@ -98,11 +98,13 @@ static int LoadROM(const char *filename)
 		}
 		bits-=9;
 
+#if 0
 		if((filesize&0xfff)) // Do we have a header?
 		{
 			filesize-=512;
 			FileNextSector(&file);	// Skip the header		
 		}
+#endif
 
 		if(filesize==(768*1024))
 			HW_HOST(HW_HOST_ROMMAPPING)=HW_HOST_ROMMAPPING_768;
@@ -299,7 +301,7 @@ static void listroms()
 		romfilenames[j][0]=0;
 }
 
-
+#if 0
 void load_pcengine(int row)
 {
 	dipswitch&=~HW_HOST_SWF_BITFLIP;
@@ -313,14 +315,13 @@ void load_tg16(int row)
 	selectrom(row);
 }
 
-
 static struct hotkey hotkeys[]=
 {
 	{KEY_P,load_pcengine},
 	{KEY_T,load_tg16},
 	{0,0}
 };
-
+#endif
 
 
 static void showrommenu(int row)
@@ -328,7 +329,7 @@ static void showrommenu(int row)
 	romindex=0;
 	listroms();
 	Menu_Set(rommenu);
-	Menu_SetHotKeys(hotkeys);
+//	Menu_SetHotKeys(hotkeys);
 }
 
 
@@ -340,12 +341,6 @@ static char *video_labels[]=
 	"TV - 480i, 60Hz"
 };
 
-static char *cart_labels[]=
-{
-	"PC Engine mode",
-	"Turbografx 16 mode"
-};
-
 
 static struct menu_entry topmenu[]=
 {
@@ -353,7 +348,6 @@ static struct menu_entry topmenu[]=
 	{MENU_ENTRY_CALLBACK,"Save settings",MENU_ACTION(&SaveSettings)},
 	{MENU_ENTRY_CYCLE,(char *)video_labels,2},
 	{MENU_ENTRY_TOGGLE,"Scanlines",HW_HOST_SWB_SCANLINES},
-	{MENU_ENTRY_CYCLE,(char *)cart_labels,2},
 	{MENU_ENTRY_CALLBACK,"Load ROM \x10",MENU_ACTION(&showrommenu)},
 	{MENU_ENTRY_CALLBACK,"Exit",MENU_ACTION(&Menu_Hide)},
 	{MENU_ENTRY_NULL,0,0}
@@ -365,7 +359,7 @@ int SetDIPSwitch(int d)
 	struct menu_entry *m;
 	MENU_TOGGLE_VALUES=d&2; // Scanlines
 	m=&topmenu[2]; MENU_CYCLE_VALUE(m)=d&1; // Video mode
-	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&4 ? 1 : 0); // Cartridge type
+//	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&4 ? 1 : 0); // Cartridge type
 }
 
 
@@ -377,9 +371,6 @@ int GetDIPSwitch()
 	m=&topmenu[2];
 	 	if(MENU_CYCLE_VALUE(m))
 			result|=1;	// Video mode
-	m=&topmenu[4];
-	 	if(MENU_CYCLE_VALUE(m))
-			result|=4;	// Cartridge type
 	if(multitap)
 		result|=HW_HOST_SWF_MULTITAP;
 
@@ -392,6 +383,8 @@ int main(int argc,char **argv)
 	int i;
 	multitap=1;
 	SetDIPSwitch(DEFAULT_DIPSWITCH_SETTINGS);
+	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Reset then release, so that we get video output.
+	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD|HW_HOST_CTRLF_BOOTDONE; // Steal the SD card too.
 
 	PS2Init();
 	EnableInterrupts();
@@ -403,9 +396,9 @@ int main(int argc,char **argv)
 	PS2Wait();
 	OSD_Show(1);	// OSD should now show correctly.
 
-	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Put core into Reset
-	HW_HOST(HW_HOST_SW)=DEFAULT_DIPSWITCH_SETTINGS;
-	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD;	// Release reset but steal SD card
+//	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Put core into Reset
+//	HW_HOST(HW_HOST_SW)=DEFAULT_DIPSWITCH_SETTINGS;
+//	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD;	// Release reset but steal SD card
 	HW_HOST(HW_HOST_MOUSEBUTTONS)=3;
 
 	OSD_Puts("Initializing SD card\n");
@@ -425,16 +418,17 @@ int main(int argc,char **argv)
 
 	LoadSettings();
 
-	if(LoadROM("BOOT    PCE"))
+	if(LoadROM("BOOT    GEN"))
 	{
 		Menu_Set(topmenu);
 		OSD_Show(0);
 	}
-	else	// If we couldn't load boot.pce then we drop into the file selector...
+	else	// If we couldn't load boot.gen then we drop into the file selector...
 	{
 		showrommenu(0);
 		Menu_Show();
 	}
+	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_BOOTDONE;	// release reset
 
 	while(1)
 	{
@@ -457,7 +451,7 @@ int main(int argc,char **argv)
 		}
 		if(visible)
 			HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_BOOTDONE|HW_HOST_CTRLF_KEYBOARD;	// capture keyboard
-		else					
+		else
 			HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_BOOTDONE;	// release keyboard
 	}
 
