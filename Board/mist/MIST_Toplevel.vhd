@@ -66,11 +66,6 @@ signal joy_1: std_logic_vector(7 downto 0);
 signal joy_2: std_logic_vector(7 downto 0);
 signal joy_3: std_logic_vector(7 downto 0);
 signal joy_4: std_logic_vector(7 downto 0);
-signal joyn_0: std_logic_vector(7 downto 0);
-signal joyn_1: std_logic_vector(7 downto 0);
-signal joyn_2: std_logic_vector(7 downto 0);
-signal joyn_3: std_logic_vector(7 downto 0);
-signal joyn_4: std_logic_vector(7 downto 0);
 signal joy_ana_0: std_logic_vector(15 downto 0);
 signal joy_ana_1: std_logic_vector(15 downto 0);
 signal txd:     std_logic;
@@ -145,22 +140,6 @@ COMPONENT video_vga_dither
 		oBlue		:	 OUT UNSIGNED(outbits-1 DOWNTO 0)
 	);
 END COMPONENT;
-
-function to_slv(s: string) return std_logic_vector is
-    constant ss: string(1 to s'length) := s;
-    variable rval: std_logic_vector(1 to 8 * s'length);
-    variable p: integer;
-    variable c: integer;
-  
-  begin  
-    for i in ss'range loop
-      p := 8 * i;
-      c := character'pos(ss(i));
-      rval(p - 7 to p) := std_logic_vector(to_unsigned(c,8));
-    end loop;
-    return rval;
-
-end function;
   
 
 component user_io 
@@ -356,9 +335,6 @@ sd_card_d: component sd_card
 		sd_sdi => sd_sdi,
 		sd_sdo => sd_sdo		
 	);
-
--- prevent joystick signals from being optimzed away
---LED <= '0' when ((joy_ana_0 /= joy_ana_1) AND (joy_0 /= joy_1)) else '1';
 	
 user_io_d : user_io
     generic map (STRLEN => 1)
@@ -399,13 +375,6 @@ user_io_d : user_io
  		serial_data => par_out_data,
  		serial_strobe => par_out_strobe
  );
- 
--- swap, invert and remap joystick bits
- joyn_0 <= not joy_1(7) & not joy_1(6) & not joy_1(5) & not joy_1(4) & not joy_1(0) & not joy_1(1) & not joy_1(2) & not joy_1(3);
- joyn_1 <= not joy_0(7) & not joy_0(6) & not joy_0(5) & not joy_0(4) & not joy_0(0) & not joy_0(1) & not joy_0(2) & not joy_0(3); 
- joyn_2 <= not joy_2(7) & not joy_2(6) & not joy_2(5) & not joy_2(4) & not joy_2(0) & not joy_2(1) & not joy_2(2) & not joy_2(3);
- joyn_3 <= not joy_3(7) & not joy_3(6) & not joy_3(5) & not joy_3(4) & not joy_3(0) & not joy_3(1) & not joy_3(2) & not joy_3(3);
- joyn_4 <= not joy_4(7) & not joy_4(6) & not joy_4(5) & not joy_4(4) & not joy_4(0) & not joy_4(1) & not joy_4(2) & not joy_4(3);
 
 vga_window<='1';
 mydither : component video_vga_dither
