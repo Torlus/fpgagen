@@ -291,6 +291,7 @@ set_global_assignment -name VHDL_FILE ../../src/chameleon_gen_sdram.vhd
 set_global_assignment -name VHDL_FILE ../../src/vdp_colinfo.vhd
 set_global_assignment -name VHDL_FILE ../../src/vdp_objinfo.vhd
 set_global_assignment -name VHDL_FILE ../../src/zram.vhd
+set_global_assignment -name VHDL_FILE ../../src/video_sync.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/OnScreenDisplay.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/OSD_Overlay.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/DualPortRAM_2Read_Unreg.vhd

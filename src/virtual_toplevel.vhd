@@ -364,6 +364,10 @@ signal VDP_BLUE	: std_logic_vector(3 downto 0);
 signal VDP_VS_N	: std_logic;
 signal VDP_HS_N	: std_logic;
 
+-- Reset Video Sync
+signal RST_VS_N	: std_logic;
+signal RST_HS_N	: std_logic;
+
 -- NTSC/RGB Video Output
 signal RED			: std_logic_vector(7 downto 0);
 signal GREEN			: std_logic_vector(7 downto 0);
@@ -1933,7 +1937,7 @@ begin
 	end if;
 end process;
 
-	
+
 -- Control module:
 
 mycontrolmodule : entity work.CtrlModule
@@ -2003,12 +2007,24 @@ overlay : entity work.OSD_Overlay
 		scanline_ena => SW(1)
 	);
 
+
+-- Video sync during reset
+
+video_sync_inst : entity work.video_sync
+	port map (
+		RST_N => not MRST_N,
+		CLK => MCLK,
+		VGA_HS => RST_HS_N,
+		VGA_VS => RST_VS_N
+);
+
+
 -- Route VDP signals to outputs
 VGA_RED <= VDP_RED & VDP_RED;
 VGA_GREEN <= VDP_GREEN & VDP_GREEN;
 VGA_BLUE <= VDP_BLUE & VDP_BLUE;
-VGA_HS_N <= VDP_HS_N;
-VGA_VS_N <= VDP_VS_N;
+VGA_HS_N <= VDP_HS_N when MRST_N='1' else RST_HS_N;
+VGA_VS_N <= VDP_VS_N when MRST_N='1' else RST_VS_N;
 
 -- Select between VGA and TV output	
 vga_red_i <= RED when SW(0)='1' else VGA_RED;
