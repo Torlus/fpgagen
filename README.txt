@@ -1,13 +1,36 @@
-IMPORTANT:
-IMPORTANT: You need to push a the keyboard a few times in order for the core to complete it's boot process.
-Then press F12 for the OSD to appear!
-IMPORTANT:
-IMPORTANT:
+This is a port of fpgagen - The  Genesis / Megadrive core to additional platform(s), currently MiST is supported.
 
-Next tasks:
-Send sync signals during reset so there is no need to press keys for the core to boot
-React on input
+The core shall be considered a work in progress as there are multiple issues:
+1. The monitor looses sync during game loading, just wait until the picture appears again
+2. Sprite flickering on heavy scenes, or on large sprites
+3. No sound yet, the Z80 is in but not any sound chip
+4. Rom file formats supported are .bin and .gen, no support for .smd files
+5. 15 kHz video mode not supported yet, only VGA works
+6. Only joystick B is connected, joystick swapping not supported yet
+7. Build for Altera DE1 board is currently broken
 
+==== Installing the core ====
+If you are not buidling the core, copy the following files to the root of your sdcard:
+fpgagen.rbf
+Configs/VGA/FPGAGEN.CFG
+
+Then rename the file fpgagen.rbf to core.rbf
+
+==== Building and installing the core ====
+The project depends on a submodule (ZPUFlex), so you need to type in the following commands after checkout.
+
+cd fpgagen
+git submodule init
+git submodule update
+
+The load the Quartus II project file, and build:
+fpgagen/syn/mist/fpgagen.qpf
+
+When you have built the core, copy the following files to the root of your sdcard:
+fpgagen/syn/mist/fpgagen.rbf
+fpgagen/Configs/VGA/FPGAGEN.CFG
+
+Then rename the file fpgagen.rbf to core.rbf
 
 ================================================================================
 fpgagen - a SEGA Megadrive/Genesis clone in a FPGA.

@@ -273,7 +273,6 @@ set_instance_assignment -name FAST_INPUT_REGISTER ON -to SDRAM_DQ[1]
 set_instance_assignment -name FAST_INPUT_REGISTER ON -to SDRAM_DQ[0]
 set_global_assignment -name VHDL_FILE ../../src/virtual_toplevel.vhd
 set_global_assignment -name VHDL_FILE ../../src/video_vga_dither.vhd
-set_global_assignment -name VHDL_FILE ../../src/video_sync.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80se.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80_Reg.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80_Pack.vhd
