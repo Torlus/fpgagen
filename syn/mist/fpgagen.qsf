@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Cyclone III"
 set_global_assignment -name DEVICE EP3C25E144C7
-set_global_assignment -name TOP_LEVEL_ENTITY MIST_TopLevel
+set_global_assignment -name TOP_LEVEL_ENTITY MIST_Toplevel
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "12.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "00:29:53  MAY 10, 2013"
 set_global_assignment -name LAST_QUARTUS_VERSION 13.1
@@ -161,6 +161,17 @@ set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -rise
 set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -fall
 set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -rise
 set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
+
+
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+
+
+
+
+
+
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -260,19 +271,9 @@ set_instance_assignment -name FAST_INPUT_REGISTER ON -to SDRAM_DQ[3]
 set_instance_assignment -name FAST_INPUT_REGISTER ON -to SDRAM_DQ[2]
 set_instance_assignment -name FAST_INPUT_REGISTER ON -to SDRAM_DQ[1]
 set_instance_assignment -name FAST_INPUT_REGISTER ON -to SDRAM_DQ[0]
-
-
-set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
-
-set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
-
-
-
-
-
-
 set_global_assignment -name VHDL_FILE ../../src/virtual_toplevel.vhd
 set_global_assignment -name VHDL_FILE ../../src/video_vga_dither.vhd
+set_global_assignment -name VHDL_FILE ../../src/video_sync.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80se.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80_Reg.vhd
 set_global_assignment -name VHDL_FILE ../../src/T80/T80_Pack.vhd
@@ -291,7 +292,6 @@ set_global_assignment -name VHDL_FILE ../../src/chameleon_gen_sdram.vhd
 set_global_assignment -name VHDL_FILE ../../src/vdp_colinfo.vhd
 set_global_assignment -name VHDL_FILE ../../src/vdp_objinfo.vhd
 set_global_assignment -name VHDL_FILE ../../src/zram.vhd
-set_global_assignment -name VHDL_FILE ../../src/video_sync.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/OnScreenDisplay.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/OSD_Overlay.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/DualPortRAM_2Read_Unreg.vhd
@@ -310,4 +310,5 @@ set_global_assignment -name VHDL_FILE ../../ZPUFlex/RTL/zpu_core_flex.vhd
 set_global_assignment -name VHDL_FILE ../../Firmware/CtrlROM/CtrlROM_ROM.vhd
 set_global_assignment -name VHDL_FILE ../../CtrlModule/CharROM/CharROM_ROM.vhd
 set_global_assignment -name QIP_FILE ../../Board/mist/pll.qip
+set_global_assignment -name SDC_FILE ../../Board/mist/constraints.sdc
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
