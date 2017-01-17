@@ -20,6 +20,7 @@
 fileTYPE file;
 static struct menu_entry topmenu[];
 int dipswitch;
+int bootstatus=0;
 
 int multitap;
 #define DEFAULT_DIPSWITCH_SETTINGS HW_HOST_SWF_MULTITAP
@@ -78,6 +79,7 @@ static int LoadROM(const char *filename)
 {
 	int opened;
 
+	bootstatus=0;
 	HW_HOST(HW_HOST_SW)=dipswitch;
 	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Put core into Reset
 	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD;	// Release reset but steal SD card
@@ -140,6 +142,8 @@ static int LoadROM(const char *filename)
 			filesize-=512;
 			++c;
 		}
+		if(result)
+			bootstatus=HW_HOST_CTRLF_BOOTDONE;
 		return(result);
 	}
 	return(0);
@@ -382,23 +386,11 @@ int main(int argc,char **argv)
 {
 	int i;
 	multitap=1;
+	bootstatus=0;
 	SetDIPSwitch(DEFAULT_DIPSWITCH_SETTINGS);
 	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Reset then release, so that we get video output.
-	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD|HW_HOST_CTRLF_BOOTDONE; // Steal the SD card too.
+	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD; // Steal the SD card too.
 
-	PS2Init();
-	EnableInterrupts();
-	PS2Wait();
-	PS2Wait();
-	OSD_Clear();
-	OSD_Show(1);	// Figure out sync polarity
-	PS2Wait();
-	PS2Wait();
-	OSD_Show(1);	// OSD should now show correctly.
-
-//	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Put core into Reset
-//	HW_HOST(HW_HOST_SW)=DEFAULT_DIPSWITCH_SETTINGS;
-//	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD;	// Release reset but steal SD card
 	HW_HOST(HW_HOST_MOUSEBUTTONS)=3;
 
 	OSD_Puts("Initializing SD card\n");
@@ -415,6 +407,15 @@ int main(int argc,char **argv)
 		return(0);
 	}
 
+	PS2Init();
+	EnableInterrupts();
+	PS2Wait();
+	PS2Wait();
+	OSD_Clear();
+	OSD_Show(1);	// Figure out sync polarity
+	PS2Wait();
+	PS2Wait();
+	OSD_Show(1);	// OSD should now show correctly.
 
 	LoadSettings();
 
@@ -422,13 +423,13 @@ int main(int argc,char **argv)
 	{
 		Menu_Set(topmenu);
 		OSD_Show(0);
+		bootstatus=HW_HOST_CTRLF_BOOTDONE;
 	}
 	else	// If we couldn't load boot.gen then we drop into the file selector...
 	{
 		showrommenu(0);
 		Menu_Show();
 	}
-	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_BOOTDONE;	// release reset
 
 	while(1)
 	{
@@ -450,9 +451,9 @@ int main(int argc,char **argv)
 			}
 		}
 		if(visible)
-			HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_BOOTDONE|HW_HOST_CTRLF_KEYBOARD;	// capture keyboard
+			HW_HOST(HW_HOST_CTRL)=bootstatus|HW_HOST_CTRLF_KEYBOARD;	// capture keyboard
 		else
-			HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_BOOTDONE;	// release keyboard
+			HW_HOST(HW_HOST_CTRL)=bootstatus;	// release keyboard
 	}
 
 	return(0);

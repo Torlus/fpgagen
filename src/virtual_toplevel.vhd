@@ -809,7 +809,7 @@ VBUS_DATA <= DMA_FLASH_D when DMA_FLASH_SEL = '1'
 	else x"FFFF";
 
 -- 68K INPUTS
-TG68_RES_N <= MRST_N;
+TG68_RES_N <= MRST_N and host_bootdone;
 TG68_CLK <= VCLK;
 TG68_CLKE <= '1';
 
@@ -1872,7 +1872,7 @@ end process;
 
 FL_DQ<=boot_data;
 
-ROM_RESET_N <= host_bootdone and host_reset_n;
+ROM_RESET_N <= host_reset_n;
 
 process( SDR_CLK )
 begin
