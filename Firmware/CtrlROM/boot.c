@@ -346,12 +346,20 @@ static char *video_labels[]=
 };
 
 
+static char *joyswap_labels[]=
+{
+	"Joystick swap",
+	"Joystick normal"
+};
+
+
 static struct menu_entry topmenu[]=
 {
 	{MENU_ENTRY_CALLBACK,"Reset",MENU_ACTION(&reset)},
 	{MENU_ENTRY_CALLBACK,"Save settings",MENU_ACTION(&SaveSettings)},
 	{MENU_ENTRY_CYCLE,(char *)video_labels,2},
 	{MENU_ENTRY_TOGGLE,"Scanlines",HW_HOST_SWB_SCANLINES},
+	{MENU_ENTRY_CYCLE,(char *)joyswap_labels,2},
 	{MENU_ENTRY_CALLBACK,"Load ROM \x10",MENU_ACTION(&showrommenu)},
 	{MENU_ENTRY_CALLBACK,"Exit",MENU_ACTION(&Menu_Hide)},
 	{MENU_ENTRY_NULL,0,0}
@@ -363,7 +371,7 @@ int SetDIPSwitch(int d)
 	struct menu_entry *m;
 	MENU_TOGGLE_VALUES=d&2; // Scanlines
 	m=&topmenu[2]; MENU_CYCLE_VALUE(m)=d&1; // Video mode
-//	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&4 ? 1 : 0); // Cartridge type
+	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&4 ? 1 : 0); // Joystick swap
 }
 
 
@@ -375,6 +383,9 @@ int GetDIPSwitch()
 	m=&topmenu[2];
 	 	if(MENU_CYCLE_VALUE(m))
 			result|=1;	// Video mode
+	m=&topmenu[4];
+	 	if(MENU_CYCLE_VALUE(m))
+			result|=4;	// Joystick swap
 	if(multitap)
 		result|=HW_HOST_SWF_MULTITAP;
 

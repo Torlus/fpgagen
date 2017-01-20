@@ -385,14 +385,13 @@ signal vga_blue_i	: std_logic_vector(7 downto 0);
 signal vga_vsync_i : std_logic;
 signal vga_hsync_i : std_logic;
 
-signal PRE_RESET_N	: std_logic;
-signal ROM_RESET_N	: std_logic := '0';
-
--- ROM signals
-signal SPLIT		: std_logic;
-signal BITFLIP		: std_logic;
+-- Joystick signals
+signal JOY_SWAP	: std_logic;
+signal JOY_1 		: std_logic_vector(7 downto 0);
+signal JOY_2 		: std_logic_vector(7 downto 0);
 
 signal SDR_INIT_DONE	: std_logic;
+signal PRE_RESET_N	: std_logic;
 
 type bootStates is (BOOT_READ_1, BOOT_WRITE_1, BOOT_WRITE_2, BOOT_DONE);
 signal bootState : bootStates := BOOT_READ_1;
@@ -431,13 +430,12 @@ begin
 
 -- Reset
 PRE_RESET_N <= reset and SDR_INIT_DONE and host_reset_n;
-MRST_N <= PRE_RESET_N and ROM_RESET_N;
+MRST_N <= PRE_RESET_N;
 
--- Bit flipping switch
-BITFLIP <= SW(2);
--- ROM splitting switch
-SPLIT <= rommap(1);
---multitap <= SW(4);
+-- Joystick swapping
+JOY_SWAP <= SW(2);
+JOY_1 <= joyb when JOY_SWAP = '1' else joya;
+JOY_2 <= joya when JOY_SWAP = '1' else joyb;
 
 -- SDRAM
 DRAM_CKE <= '1';
@@ -577,20 +575,27 @@ port map(
 	RST_N		=> MRST_N,
 	CLK			=> VCLK,
 
-	P1_UP		=> not joya(3),
-	P1_DOWN	=> not joya(2),
-	P1_LEFT	=> not joya(1),
-	P1_RIGHT	=> not joya(0),
-	P1_A		=> not joya(4),
-	P1_B		=> not joya(5),
-	P1_C		=> not joya(6),
-	P1_START	=> not joya(7),
+	P1_UP		=> not JOY_1(3),
+	P1_DOWN	=> not JOY_1(2),
+	P1_LEFT	=> not JOY_1(1),
+	P1_RIGHT	=> not JOY_1(0),
+	P1_A		=> not JOY_1(4),
+	P1_B		=> not JOY_1(5),
+	P1_C		=> not JOY_1(6),
+	P1_START	=> not JOY_1(7),
 		
-	-- GPIO_1		=> GPIO_1,
+	P2_UP		=> not JOY_2(3),
+	P2_DOWN	=> not JOY_2(2),
+	P2_LEFT	=> not JOY_2(1),
+	P2_RIGHT	=> not JOY_2(0),
+	P2_A		=> not JOY_2(4),
+	P2_B		=> not JOY_2(5),
+	P2_C		=> not JOY_2(6),
+	P2_START	=> not JOY_2(7),
 		
-	SEL			=> IO_SEL,
+	SEL		=> IO_SEL,
 	A			=> IO_A,
-	RNW			=> IO_RNW,
+	RNW		=> IO_RNW,
 	UDS_N		=> IO_UDS_N,
 	LDS_N		=> IO_LDS_N,
 	DI			=> IO_DI,
@@ -1872,8 +1877,6 @@ end process;
 
 FL_DQ<=boot_data;
 
-ROM_RESET_N <= host_reset_n;
-
 process( SDR_CLK )
 begin
 	if rising_edge( SDR_CLK ) then
@@ -1898,28 +1901,7 @@ begin
 						bootState <= BOOT_DONE;
 					end if;
 				when BOOT_WRITE_1 =>
-					if BITFLIP = '1' then
-						romwr_d <=
-							FL_DQ(8)
-							& FL_DQ(9)
-							& FL_DQ(10)
-							& FL_DQ(11)
-							& FL_DQ(12)
-							& FL_DQ(13)
-							& FL_DQ(14)
-							& FL_DQ(15)
-							& FL_DQ(0)
-							& FL_DQ(1)
-							& FL_DQ(2)
-							& FL_DQ(3)
-							& FL_DQ(4)
-							& FL_DQ(5)
-							& FL_DQ(6)
-							& FL_DQ(7);
-					else
-						romwr_d <= FL_DQ;
-					end if;
-					
+					romwr_d <= FL_DQ;
 					romwr_req <= not romwr_req;
 					bootState <= BOOT_WRITE_2;
 				when BOOT_WRITE_2 =>
@@ -1938,7 +1920,7 @@ end process;
 
 mycontrolmodule : entity work.CtrlModule
 	generic map (
-		sysclk_frequency => 1270 -- Sysclk frequency * 10
+		sysclk_frequency => 1080 -- Sysclk frequency * 10
 	)
 	port map (
 		clk => SDR_CLK,

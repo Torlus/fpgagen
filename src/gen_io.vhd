@@ -41,27 +41,34 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity gen_io is
 	port(
 		RST_N		: in std_logic;
-		CLK			: in std_logic;
+		CLK		: in std_logic;
 		
 		P1_UP		: in std_logic;
-		P1_DOWN		: in std_logic;
-		P1_LEFT		: in std_logic;
+		P1_DOWN	: in std_logic;
+		P1_LEFT	: in std_logic;
 		P1_RIGHT	: in std_logic;
 		P1_A		: in std_logic;
 		P1_B		: in std_logic;
 		P1_C		: in std_logic;
-		P1_START	: in std_logic;		
+		P1_START	: in std_logic;
 
-		-- GPIO_1		: inout std_logic_vector(35 downto 0);
-		
-		SEL			: in std_logic;
+		P2_UP		: in std_logic;
+		P2_DOWN	: in std_logic;
+		P2_LEFT	: in std_logic;
+		P2_RIGHT	: in std_logic;
+		P2_A		: in std_logic;
+		P2_B		: in std_logic;
+		P2_C		: in std_logic;
+		P2_START	: in std_logic;
+
+		SEL		: in std_logic;
 		A			: in std_logic_vector(4 downto 0);
-		RNW			: in std_logic;
+		RNW		: in std_logic;
 		UDS_N		: in std_logic;
 		LDS_N		: in std_logic;
 		DI			: in std_logic_vector(15 downto 0);
 		DO			: out std_logic_vector(15 downto 0);
-		DTACK_N		: out std_logic		
+		DTACK_N	: out std_logic		
 	);
 end gen_io;
 architecture rtl of gen_io is
@@ -90,10 +97,6 @@ signal RD		: std_logic_vector(7 downto 0);
 
 
 begin
-
--- GPIO_1(35 downto 6) <= (others => 'Z');
--- GPIO_1(4 downto 0) <= (others => 'Z');
--- GPIO_1(5) <= DATA(6);
 
 DO <= RD & RD;
 DTACK_N <= FF_DTACK_N;
@@ -213,22 +216,23 @@ begin
 						if CTLA(1) = '0' then RD(1) <= P1_DOWN; end if;
 						if CTLA(0) = '0' then RD(0) <= P1_UP; end if;					
 					end if;
-					-- if CTLA(5) = '0' then RD(5) <= GPIO_1(6); end if;
-					-- if CTLA(4) = '0' then RD(4) <= GPIO_1(4); end if;
-					-- if CTLA(3) = '0' then RD(3) <= GPIO_1(2); end if;
-					-- if CTLA(2) = '0' then RD(2) <= GPIO_1(3); end if;
-					-- if CTLA(1) = '0' then RD(1) <= GPIO_1(1); end if;
-					-- if CTLA(0) = '0' then RD(0) <= GPIO_1(0); end if;
-					
-				when x"2" => -- Unconnected port
+				when x"2" =>
 					RD <= DATB;
-					if CTLB(6) = '0' then RD(6) <= '1'; end if;
-					if CTLB(5) = '0' then RD(5) <= '1'; end if;
-					if CTLB(4) = '0' then RD(4) <= '1'; end if;
-					if CTLB(3) = '0' then RD(3) <= '1'; end if;
-					if CTLB(2) = '0' then RD(2) <= '1'; end if;
-					if CTLB(1) = '0' then RD(1) <= '1'; end if;
-					if CTLB(0) = '0' then RD(0) <= '1'; end if;
+					if DATB(6) = '0' then -- 3-button pad
+						if CTLB(5) = '0' then RD(5) <= P2_START; end if;
+						if CTLB(4) = '0' then RD(4) <= P2_A; end if;
+						if CTLB(3) = '0' then RD(3) <= '0'; end if;
+						if CTLB(2) = '0' then RD(2) <= '0'; end if;
+						if CTLB(1) = '0' then RD(1) <= P2_DOWN; end if;
+						if CTLB(0) = '0' then RD(0) <= P2_UP; end if;
+					else
+						if CTLB(5) = '0' then RD(5) <= P2_C; end if;
+						if CTLB(4) = '0' then RD(4) <= P2_B; end if;
+						if CTLB(3) = '0' then RD(3) <= P2_RIGHT; end if;
+						if CTLB(2) = '0' then RD(2) <= P2_LEFT; end if;
+						if CTLB(1) = '0' then RD(1) <= P2_DOWN; end if;
+						if CTLB(0) = '0' then RD(0) <= P2_UP; end if;					
+					end if;
 				when x"3" => -- Unconnected port
 					RD <= DATC;
 					if CTLC(6) = '0' then RD(6) <= '1'; end if;

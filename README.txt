@@ -1,7 +1,8 @@
 This is a port of fpgagen - The  Genesis / Megadrive core to additional platform(s), currently MiST is supported.
 
 The core shall be considered a work in progress as there are multiple issues:
-1. The monitor looses sync during game loading, just wait until the picture appears again
+1. Do not build with Quartus version II 1.13.0 upgrade to version 13.1.4.182
+   (otherwise your core might freeze during game loading)
 2. Sprite flickering on heavy scenes, or on large sprites
 3. No sound yet, the Z80 is in but not any sound chip
 4. Rom file formats supported are .bin and .gen, no support for .smd files
