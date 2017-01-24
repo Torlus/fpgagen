@@ -58,7 +58,7 @@ entity vdp is
 		vram_req : out std_logic;
 		vram_ack : in std_logic;
 		vram_we : out std_logic;
-		vram_a : out std_logic_vector((13+9+2) downto 1);
+		vram_a : out std_logic_vector(14 downto 0);
 		vram_d : out std_logic_vector(15 downto 0);
 		vram_q : in std_logic_vector(15 downto 0);
 		vram_u_n : out std_logic;
@@ -95,7 +95,7 @@ architecture rtl of vdp is
 
 signal vram_req_reg : std_logic;
 signal vram_we_reg : std_logic;
-signal vram_a_reg : std_logic_vector((13+9+2) downto 1);
+signal vram_a_reg : std_logic_vector(14 downto 0);
 signal vram_d_reg : std_logic_vector(15 downto 0);
 signal vram_u_n_reg : std_logic;
 signal vram_l_n_reg : std_logic;
@@ -887,22 +887,22 @@ begin
 			
 			if BGB_SEL = '1' and BGB_DTACK_N = '1' then
 				vram_req_reg <= not vram_req_reg;
-				vram_a_reg <= "00" & "1100000" & BGB_VRAM_ADDR;
+				vram_a_reg <= BGB_VRAM_ADDR;
 				
 				VMC <= VMC_BGB_RD1;
 			elsif BGA_SEL = '1' and BGA_DTACK_N = '1' then
 				vram_req_reg <= not vram_req_reg;
-				vram_a_reg <= "00" & "1100000" & BGA_VRAM_ADDR;
+				vram_a_reg <= BGA_VRAM_ADDR;
 				
 				VMC <= VMC_BGA_RD1;
 			elsif SP1_SEL = '1' and SP1_DTACK_N = '1' then
 				vram_req_reg <= not vram_req_reg;
-				vram_a_reg <= "00" & "1100000" & SP1_VRAM_ADDR;
+				vram_a_reg <= SP1_VRAM_ADDR;
 				
 				VMC <= VMC_SP1_RD1;			
 			elsif SP2_SEL = '1' and SP2_DTACK_N = '1' then
 				vram_req_reg <= not vram_req_reg;
-				vram_a_reg <= "00" & "1100000" & SP2_VRAM_ADDR;
+				vram_a_reg <= SP2_VRAM_ADDR;
 				
 				VMC <= VMC_SP2_RD1;			
 			elsif DT_VRAM_SEL = '1' and DT_VRAM_DTACK_N = '1' then
@@ -927,7 +927,7 @@ begin
 				end if;
 -- synthesis translate_on					
 				vram_req_reg <= not vram_req_reg;
-				vram_a_reg <= "00" & "1100000" & DT_VRAM_ADDR;
+				vram_a_reg <= DT_VRAM_ADDR;
 				vram_d_reg <= DT_VRAM_DI;
 				vram_we_reg <= not DT_VRAM_RNW;
 				vram_u_n_reg <= DT_VRAM_UDS_N;

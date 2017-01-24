@@ -94,21 +94,19 @@ end entity;
 
 architecture rtl of Virtual_Toplevel is
 
-constant addrwidth : integer := rowAddrBits+colAddrBits+2;
-
 -- "FLASH"
 signal romwr_req : std_logic := '0';
 signal romwr_ack : std_logic;
 signal romwr_we  : std_logic := '1';
-signal romwr_a : unsigned(addrwidth downto 1);
+signal romwr_a : unsigned(21 downto 1);
 signal romwr_d : std_logic_vector(15 downto 0);
 signal romwr_q : std_logic_vector(15 downto 0);
 
 signal romrd_req : std_logic := '0';
 signal romrd_ack : std_logic;
-signal romrd_a : std_logic_vector(addrwidth downto 3);
+signal romrd_a : std_logic_vector(21 downto 3);
 signal romrd_q : std_logic_vector(63 downto 0);
-signal romrd_a_cached : std_logic_vector(addrwidth downto 3);
+signal romrd_a_cached : std_logic_vector(21 downto 3);
 signal romrd_q_cached : std_logic_vector(63 downto 0);
 type fc_t is ( FC_IDLE, 
 	FC_TG68_RD,
@@ -121,7 +119,7 @@ signal FC : fc_t;
 signal ram68k_req : std_logic;
 signal ram68k_ack : std_logic;
 signal ram68k_we : std_logic;
-signal ram68k_a : std_logic_vector(addrwidth downto 1);
+signal ram68k_a : std_logic_vector(15 downto 1);
 signal ram68k_d : std_logic_vector(15 downto 0);
 signal ram68k_q : std_logic_vector(15 downto 0);
 signal ram68k_l_n : std_logic;
@@ -131,7 +129,7 @@ signal ram68k_u_n : std_logic;
 signal vram_req : std_logic;
 signal vram_ack : std_logic;
 signal vram_we : std_logic;
-signal vram_a : std_logic_vector(addrwidth downto 1);
+signal vram_a : std_logic_vector(15 downto 1);
 signal vram_d : std_logic_vector(15 downto 0);
 signal vram_q : std_logic_vector(15 downto 0);
 signal vram_l_n : std_logic;
@@ -1530,8 +1528,8 @@ begin
 						TG68_FLASH_DTACK_N <= '0';
 					else
 						romrd_req <= not romrd_req;
-						romrd_a <= "000" & TG68_A(21 downto 3);
-						romrd_a_cached <= "000" & TG68_A(21 downto 3);
+						romrd_a <= TG68_A(21 downto 3);
+						romrd_a_cached <= TG68_A(21 downto 3);
 						FC <= FC_TG68_RD;
 					end if;
 				elsif T80_FLASH_SEL = '1' and T80_FLASH_DTACK_N = '1' then
@@ -1560,8 +1558,8 @@ begin
 						T80_FLASH_DTACK_N <= '0';
 					else
 						romrd_req <= not romrd_req;
-						romrd_a <= "000" & BAR(21 downto 15) & T80_A(14 downto 3);
-						romrd_a_cached <= "000" & BAR(21 downto 15) & T80_A(14 downto 3);		
+						romrd_a <= BAR(21 downto 15) & T80_A(14 downto 3);
+						romrd_a_cached <= BAR(21 downto 15) & T80_A(14 downto 3);		
 						FC <= FC_T80_RD;
 					end if;
 				elsif DMA_FLASH_SEL = '1' and DMA_FLASH_DTACK_N = '1' then
@@ -1581,8 +1579,8 @@ begin
 						DMA_FLASH_DTACK_N <= '0';
 					else
 						romrd_req <= not romrd_req;
-						romrd_a <= "000" & VBUS_ADDR(21 downto 3);
-						romrd_a_cached <= "000" & VBUS_ADDR(21 downto 3);
+						romrd_a <= VBUS_ADDR(21 downto 3);
+						romrd_a_cached <= VBUS_ADDR(21 downto 3);
 						FC <= FC_DMA_RD;
 					end if;					
 				end if;				
@@ -1725,7 +1723,7 @@ begin
 			if VCLKCNT = "001" then
 				if TG68_SDRAM_SEL = '1' and TG68_SDRAM_DTACK_N = '1' then
 					ram68k_req <= not ram68k_req;
-					ram68k_a <= "00" & "1000000" & TG68_A(15 downto 1);
+					ram68k_a <= TG68_A(15 downto 1);
 					ram68k_d <= TG68_DO;
 					ram68k_we <= not TG68_RNW;
 					ram68k_u_n <= TG68_UDS_N;
@@ -1733,7 +1731,7 @@ begin
 					SDRC <= SDRC_TG68;
 				elsif T80_SDRAM_SEL = '1' and T80_SDRAM_DTACK_N = '1' then
 					ram68k_req <= not ram68k_req;
-					ram68k_a <= "00" & "1000000" & BAR(15) & T80_A(14 downto 1);
+					ram68k_a <= BAR(15) & T80_A(14 downto 1);
 					ram68k_d <= T80_DO & T80_DO;
 					ram68k_we <= not T80_WR_N;
 					ram68k_u_n <= T80_A(0);
@@ -1741,7 +1739,7 @@ begin
 					SDRC <= SDRC_T80;
 				elsif DMA_SDRAM_SEL = '1' and DMA_SDRAM_DTACK_N = '1' then
 					ram68k_req <= not ram68k_req;
-					ram68k_a <= "00" & "1000000" & VBUS_ADDR(15 downto 1);
+					ram68k_a <= VBUS_ADDR(15 downto 1);
 					ram68k_we <= '0';
 					ram68k_u_n <= '0';
 					ram68k_l_n <= '0';					
@@ -1885,7 +1883,7 @@ begin
 			boot_req <='0';
 			
 			romwr_req <= '0';
-			romwr_a <= to_unsigned(0, addrwidth);
+			romwr_a <= to_unsigned(0, 21);
 			bootState<=BOOT_READ_1;
 			
 		else

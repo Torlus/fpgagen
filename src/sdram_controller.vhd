@@ -28,7 +28,7 @@ entity sdram_controller is
 		ram68k_req : in std_logic;
 		ram68k_ack : out std_logic;
 		ram68k_we : in std_logic;
-		ram68k_a : in std_logic_vector(rowAddrBits+colAddrBits+2 downto 1);
+		ram68k_a : in std_logic_vector(15 downto 1);
 		ram68k_d : in std_logic_vector(15 downto 0);
 		ram68k_q : out std_logic_vector(15 downto 0);
 		ram68k_u_n : in std_logic;
@@ -37,7 +37,7 @@ entity sdram_controller is
 		vram_req : in std_logic;
 		vram_ack : out std_logic;
 		vram_we : in std_logic;
-		vram_a : in std_logic_vector(rowAddrBits+colAddrBits+2 downto 1);
+		vram_a : in std_logic_vector(15 downto 1);
 		vram_d : in std_logic_vector(15 downto 0);
 		vram_q : out std_logic_vector(15 downto 0);
 		vram_u_n : in std_logic;
@@ -46,13 +46,13 @@ entity sdram_controller is
 		romwr_req : in std_logic;
 		romwr_ack : out std_logic;
 		romwr_we : in std_logic;
-		romwr_a : in std_logic_vector(rowAddrBits+colAddrBits+2 downto 1);
+		romwr_a : in std_logic_vector(21 downto 1);
 		romwr_d : in std_logic_vector(15 downto 0);
 		romwr_q : out std_logic_vector(15 downto 0);
 		
 		romrd_req : in std_logic;
 		romrd_ack : out std_logic;
-		romrd_a : in std_logic_vector(rowAddrBits+colAddrBits+2 downto 3);
+		romrd_a : in std_logic_vector(21 downto 3);
 		romrd_q : out std_logic_vector(63 downto 0);
 
 		
@@ -85,18 +85,18 @@ architecture rtl of sdram_controller is
 	
 begin
 	
-	romrd_a_u <= unsigned(romrd_a);
+	romrd_a_u <= unsigned(std_logic_vector(to_unsigned(0, addrwidth - 21)) & romrd_a);
 	romrd_q <= std_logic_vector(romrd_q_u);
 	
-	romwr_a_u <= unsigned(romwr_a);
+	romwr_a_u <= unsigned(std_logic_vector(to_unsigned(0, addrwidth - 21)) & romwr_a);
 	romwr_d_u <= unsigned(romwr_d);
 	romwr_q <= std_logic_vector(romwr_q_u);
 
-	ram68k_a_u <= unsigned(ram68k_a);
+	ram68k_a_u <= unsigned(std_logic_vector(to_unsigned(2#1000000#, addrwidth - 15)) & ram68k_a);
 	ram68k_d_u <= unsigned(ram68k_d);
 	ram68k_q <= std_logic_vector(ram68k_q_u);
 
-	vram_a_u <= unsigned(vram_a);
+	vram_a_u <= unsigned(std_logic_vector(to_unsigned(2#1100000#, addrwidth - 15)) & vram_a);
 	vram_d_u <= unsigned(vram_d);
 	vram_q <= std_logic_vector(vram_q_u);
 	
