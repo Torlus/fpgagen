@@ -84,6 +84,13 @@ $(ROMGEN): $(ZPUFLEXDIR)/Firmware/zpuromgen.c
 	sed 's/dualportram/$*_ROM/' >$*_ROM.vhd <$(RTL_DIR)/rom_prologue.vhd
 	$(ROMGEN) $*.bin >>$*_ROM.vhd
 	cat >>$*_ROM.vhd $(RTL_DIR)/rom_epilogue.vhd
+	# Experimental - split the ROM into two pieces to reduce block ROM demands.
+	sed 's/dualportram/$*_ROM1/' >$*_ROM1.vhd <$(RTL_DIR)/rom_prologue.vhd
+	$(ROMGEN) -l8192 $*.bin >>$*_ROM1.vhd
+	cat >>$*_ROM1.vhd $(RTL_DIR)/rom_epilogue.vhd
+	sed 's/dualportram/$*_ROM2/' >$*_ROM2.vhd <$(RTL_DIR)/rom_prologue.vhd
+	$(ROMGEN) -o8192 -l2048 $*.bin >>$*_ROM2.vhd
+	cat >>$*_ROM2.vhd $(RTL_DIR)/rom_epilogue.vhd
 
 # Link - this produces an ELF binary.
 

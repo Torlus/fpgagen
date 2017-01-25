@@ -297,4 +297,8 @@ set_global_assignment -name QIP_FILE ../../Board/chameleon64/pll.qip
 set_global_assignment -name SDC_FILE ../../Board/chameleon64/constraints.sdc
 
 
+set_global_assignment -name VHDL_FILE ../../Firmware/CtrlROM/CtrlROM_ROM2.vhd
+set_global_assignment -name VHDL_FILE ../../Firmware/CtrlROM/CtrlROM_ROM1.vhd
+set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/CtrlROM.vhd
+set_global_assignment -name VHDL_FILE ../../CtrlModule/RTL/MergeROM.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

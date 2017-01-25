@@ -172,7 +172,7 @@ begin
 
 -- ROM
 
-	myrom : entity work.CtrlROM_ROM
+	mysplitrom : entity work.CtrlROM
 	generic map
 	(
 		maxAddrBitBRAM => 13
@@ -182,6 +182,17 @@ begin
 		from_zpu => zpu_to_rom,
 		to_zpu => zpu_from_rom
 	);
+
+--	myrom : entity work.CtrlROM_ROM
+--	generic map
+--	(
+--		maxAddrBitBRAM => 13
+--	)
+--	port map (
+--		clk => clk,
+--		from_zpu => zpu_to_rom,
+--		to_zpu => zpu_from_rom
+--	);
 
 
 -- Reset counter.
