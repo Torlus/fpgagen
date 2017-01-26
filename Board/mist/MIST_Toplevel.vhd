@@ -114,15 +114,15 @@ signal ps2_mouse_clk_out : std_logic;
 signal ps2_mouse_dat_out : std_logic;
 
 -- Sigma Delta audio
---COMPONENT hybrid_pwm_sd
---	PORT
---	(
---		clk		:	 IN STD_LOGIC;
---		n_reset		:	 IN STD_LOGIC;
---		din		:	 IN STD_LOGIC_VECTOR(15 DOWNTO 0);
---		dout		:	 OUT STD_LOGIC
---	);
---END COMPONENT;
+COMPONENT hybrid_pwm_sd
+	PORT
+	(
+		clk		:	 IN STD_LOGIC;
+		n_reset		:	 IN STD_LOGIC;
+		din		:	 IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+		dout		:	 OUT STD_LOGIC
+	);
+END COMPONENT;
 
 COMPONENT video_vga_dither
 	GENERIC ( outbits : INTEGER := 4 );
@@ -302,7 +302,7 @@ virtualtoplevel : entity work.Virtual_Toplevel
 
 mist_console_d: component mist_console
 	generic map
-	( CLKFREQ => 100)
+	( CLKFREQ => 108)
 	port map
 	(
 		clk => memclk,
@@ -396,22 +396,22 @@ mydither : component video_vga_dither
  
 
 -- Do we have audio?  If so, instantiate a two DAC channels.
---leftsd: component hybrid_pwm_sd
---	port map
---	(
---		clk => memclk,
---		n_reset => reset,
---		din => not audiol(15) & std_logic_vector(audiol(14 downto 0)),
---		dout => AUDIO_L
---	);
+leftsd: component hybrid_pwm_sd
+	port map
+	(
+		clk => memclk,
+		n_reset => reset,
+		din => not audiol(15) & std_logic_vector(audiol(14 downto 0)),
+		dout => AUDIO_L
+	);
 	
---rightsd: component hybrid_pwm_sd
---	port map
---	(
---		clk => memclk,
---		n_reset => reset,
---		din => not audior(15) & std_logic_vector(audior(14 downto 0)),
---		dout => AUDIO_R
---	);
+rightsd: component hybrid_pwm_sd
+	port map
+	(
+		clk => memclk,
+		n_reset => reset,
+		din => not audior(15) & std_logic_vector(audior(14 downto 0)),
+		dout => AUDIO_R
+	);
 
 end architecture;

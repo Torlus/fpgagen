@@ -1,14 +1,12 @@
-This is a port of fpgagen - The  Genesis / Megadrive core to additional platform(s), currently MiST is supported.
+This is a port of fpgagen - Genesis/Megadrive core to additional platform(s)
+MiST, Turbo Chameleon 64, Altera/Terasic DE2 board
 
 The core shall be considered a work in progress as there are multiple issues:
-1. Do not build with Quartus version II 1.13.0 upgrade to version 13.1.4.182
-   (otherwise your core might freeze during game loading)
-2. Sprite flickering on heavy scenes, or on large sprites
-3. No sound yet, the Z80 is in but not any sound chip
-4. Rom file formats supported are .bin and .gen, no support for .smd files
-5. 15 kHz video mode not supported yet, only VGA works
-6. Only joystick B is connected, joystick swapping not supported yet
-7. Build for Altera DE1 board is currently broken
+1. Sprite flickering on heavy scenes, or on large sprites
+2. No sound yet, the Z80 is in but not any sound chip
+3. Rom file formats supported are .bin and .gen, no support for .smd files
+4. 15 kHz video mode not supported yet, only VGA works
+5. The design does not fit on the Altera/Terasic DE1 board anymore
 
 ==== Installing the core ====
 If you are not buidling the core, copy the following files to the root of your sdcard:
