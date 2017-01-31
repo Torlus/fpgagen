@@ -562,6 +562,7 @@ signal T_BGA_COLINFO	: std_logic_vector(6 downto 0);
 signal T_OBJ_COLINFO	: std_logic_vector(6 downto 0);
 signal T_COLOR			: std_logic_vector(15 downto 0);
 
+signal COLOR		: std_logic_vector(8 downto 0);
 signal FF_HS		: std_logic;
 signal FF_VS		: std_logic;
 
@@ -2185,6 +2186,7 @@ process( CLK )
 begin
 	if rising_edge(CLK) then
 		if H_CNT(0) = '1' then
+			COLOR <= FF_R & FF_G & FF_B;
 			if V_CNT(1) = '0' then
 				LINE0( CONV_INTEGER(H_CNT(11 downto 1)) ) <= FF_R & FF_G & FF_B;
 			else
@@ -2263,9 +2265,9 @@ VGA_G <= FF_VGA_G;
 VGA_B <= FF_VGA_B;
 VGA_HS <= FF_VGA_HS;
 VGA_VS <= FF_VGA_VS;
-R <= (others => '0'); -- TODO
-G <= (others => '0'); -- TODO
-B <= (others => '0'); -- TODO
+R <= COLOR(8 downto 6) & '0';
+G <= COLOR(5 downto 3) & '0';
+B <= COLOR(2 downto 0) & '0';
 HS <= FF_HS;
 VS <= FF_VS;
 
