@@ -81,6 +81,12 @@ entity vdp is
 		
 		VBUS_SEL		: out std_logic;
 		VBUS_DTACK_N	: in std_logic;
+
+		R		: out std_logic_vector(3 downto 0);
+		G		: out std_logic_vector(3 downto 0);
+		B		: out std_logic_vector(3 downto 0);
+		HS		: out std_logic;
+		VS		: out std_logic;
 		
 		VGA_R		: out std_logic_vector(3 downto 0);
 		VGA_G		: out std_logic_vector(3 downto 0);
@@ -555,6 +561,9 @@ signal T_BGB_COLINFO	: std_logic_vector(6 downto 0);
 signal T_BGA_COLINFO	: std_logic_vector(6 downto 0);
 signal T_OBJ_COLINFO	: std_logic_vector(6 downto 0);
 signal T_COLOR			: std_logic_vector(15 downto 0);
+
+signal FF_HS		: std_logic;
+signal FF_VS		: std_logic;
 
 -- Scandoubler
 type scanline_t is array(0 to (CLOCKS_PER_LINE/2)-1) of std_logic_vector(8 downto 0);
@@ -2211,8 +2220,15 @@ end process;
 process( RST_N, CLK )
 begin
 	if RST_N = '0' then
+		FF_VS <= '1';
 		FF_VGA_VS <= '1';
 	elsif rising_edge(CLK) then
+		if V_CNT = 0 then
+			FF_VS <= '0';
+		end if;
+		if V_CNT = (VS_LINES*2) then
+			FF_VS <= '1';
+		end if;
 		if V_CNT = 0 then
 			FF_VGA_VS <= '0';
 		elsif V_CNT = (VGA_VS_LINES*2) then
@@ -2225,8 +2241,15 @@ end process;
 process( RST_N, CLK )
 begin
 	if RST_N = '0' then
+		FF_HS <= '1';
 		FF_VGA_HS <= '1';
 	elsif rising_edge(CLK) then
+		if H_CNT = 0 then
+			FF_HS <= '0';
+		end if;
+		if H_CNT = HS_CLOCKS then
+			FF_HS <= '1';
+		end if;
 		if H_VGA_CNT = 0 then
 			FF_VGA_HS <= '0';
 		elsif H_VGA_CNT = VGA_HS_CLOCKS then
@@ -2240,6 +2263,11 @@ VGA_G <= FF_VGA_G;
 VGA_B <= FF_VGA_B;
 VGA_HS <= FF_VGA_HS;
 VGA_VS <= FF_VGA_VS;
+R <= (others => '0'); -- TODO
+G <= (others => '0'); -- TODO
+B <= (others => '0'); -- TODO
+HS <= FF_HS;
+VS <= FF_VS;
 
 ----------------------------------------------------------------
 -- VIDEO DEBUG

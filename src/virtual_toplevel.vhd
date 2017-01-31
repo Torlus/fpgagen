@@ -71,6 +71,7 @@ entity Virtual_Toplevel is
 		VGA_B		: out std_logic_vector(7 downto 0);
 		VGA_VS		: out std_logic;
 		VGA_HS		: out std_logic;
+		VID_15KHZ	: out std_logic;
 		
 		LED : out std_logic;
 
@@ -362,6 +363,12 @@ signal VDP_BLUE	: std_logic_vector(3 downto 0);
 signal VDP_VS_N	: std_logic;
 signal VDP_HS_N	: std_logic;
 
+signal VDP_VGA_RED	: std_logic_vector(3 downto 0);
+signal VDP_VGA_GREEN	: std_logic_vector(3 downto 0);
+signal VDP_VGA_BLUE	: std_logic_vector(3 downto 0);
+signal VDP_VGA_VS_N	: std_logic;
+signal VDP_VGA_HS_N	: std_logic;
+
 -- NTSC/RGB Video Output
 signal RED			: std_logic_vector(7 downto 0);
 signal GREEN			: std_logic_vector(7 downto 0);
@@ -643,11 +650,17 @@ port map(
 	VBUS_SEL			=> VBUS_SEL,
 	VBUS_DTACK_N	=> VBUS_DTACK_N,
 	
-	VGA_R				=> VDP_RED,
-	VGA_G				=> VDP_GREEN,
-	VGA_B				=> VDP_BLUE,
-	VGA_HS			=> VDP_HS_N,
-	VGA_VS			=> VDP_VS_N
+	R					=> VDP_RED,
+	G					=> VDP_GREEN,
+	B					=> VDP_BLUE,
+	HS					=> VDP_HS_N,
+	VS					=> VDP_VS_N,
+	
+	VGA_R				=> VDP_VGA_RED,
+	VGA_G				=> VDP_VGA_GREEN,
+	VGA_B				=> VDP_VGA_BLUE,
+	VGA_HS			=> VDP_VGA_HS_N,
+	VGA_VS			=> VDP_VGA_VS_N
 );
 
 -- FM
@@ -1984,11 +1997,17 @@ overlay : entity work.OSD_Overlay
 	);
 
 -- Route VDP signals to outputs
-VGA_RED <= VDP_RED & VDP_RED;
-VGA_GREEN <= VDP_GREEN & VDP_GREEN;
-VGA_BLUE <= VDP_BLUE & VDP_BLUE;
-VGA_HS_N <= VDP_HS_N;
-VGA_VS_N <= VDP_VS_N;
+RED <= VDP_RED & VDP_RED;
+GREEN <= VDP_GREEN & VDP_GREEN;
+BLUE <= VDP_BLUE & VDP_BLUE;
+HS_N <= VDP_HS_N;
+VS_N <= VDP_VS_N;
+
+VGA_RED <= VDP_VGA_RED & VDP_VGA_RED;
+VGA_GREEN <= VDP_VGA_GREEN & VDP_VGA_GREEN;
+VGA_BLUE <= VDP_VGA_BLUE & VDP_VGA_BLUE;
+VGA_HS_N <= VDP_VGA_HS_N;
+VGA_VS_N <= VDP_VGA_VS_N;
 
 -- Select between VGA and TV output	
 vga_red_i <= RED when SW(0)='1' else VGA_RED;
@@ -1998,6 +2017,7 @@ vga_hsync_i <= HS_N when SW(0)='1' else VGA_HS_N;
 vga_vsync_i <= VS_N when SW(0)='1' else VGA_VS_N;
 VGA_HS <= vga_hsync_i;
 VGA_VS <= vga_vsync_i;
+VID_15KHZ <= SW(0);
 
 
 -- #############################################################################

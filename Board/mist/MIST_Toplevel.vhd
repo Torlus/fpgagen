@@ -56,7 +56,10 @@ signal audior : std_logic_vector(15 downto 0);
 signal vga_tred : unsigned(7 downto 0);
 signal vga_tgreen : unsigned(7 downto 0);
 signal vga_tblue : unsigned(7 downto 0);
+signal vga_ths		: std_logic;
+signal vga_tvs		: std_logic;
 signal vga_window : std_logic;
+signal vid_15khz	: std_logic;
 
 -- user_io
 signal buttons: std_logic_vector(1 downto 0);
@@ -285,8 +288,9 @@ virtualtoplevel : entity work.Virtual_Toplevel
     unsigned(VGA_G) => vga_tgreen,
     unsigned(VGA_B) => vga_tblue,
 
-    VGA_HS => VGA_HS,
-    VGA_VS => VGA_VS,
+    VGA_HS => vga_ths,
+    VGA_VS => vga_tvs,
+	 VID_15KHZ => vid_15khz,
 	 
 	 LED => LED,
 
@@ -383,8 +387,8 @@ mydither : component video_vga_dither
 	)
 	port map (
 		clk => memclk,
-		hsync => VGA_HS,
-		vsync => VGA_VS,
+		hsync => vga_ths,
+		vsync => vga_tvs,
 		vid_ena => vga_window,
 		iRed => vga_tred,
 		iGreen => vga_tgreen,
@@ -394,6 +398,9 @@ mydither : component video_vga_dither
 		std_logic_vector(oBlue) => VGA_B
 	);
  
+ -- If 15kHz Video - composite sync to VGA_HS and VGA_VS high for MiST RGB cable
+VGA_HS <= not (vga_ths xor vga_tvs) when vid_15khz='1' else vga_ths;
+VGA_VS <= '1' when vid_15khz='1' else vga_tvs;
 
 -- Do we have audio?  If so, instantiate a two DAC channels.
 leftsd: component hybrid_pwm_sd
