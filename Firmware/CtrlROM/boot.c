@@ -189,6 +189,15 @@ static struct menu_entry rommenu[]=
 };
 
 
+static struct menu_entry loaderror[]=
+{
+	{MENU_ENTRY_SUBMENU,"Load Error!",MENU_ACTION(topmenu)},
+	{MENU_ENTRY_SUBMENU,"",MENU_ACTION(topmenu)},
+	{MENU_ENTRY_SUBMENU,"OK",MENU_ACTION(topmenu)},
+	{MENU_ENTRY_NULL,0,0}
+};
+
+
 static void copyname(char *dst,const unsigned char *src,int l)
 {
 	int i;
@@ -215,14 +224,24 @@ static DIRENTRY *nthfile(int n)
 static void selectrom(int row)
 {
 	DIRENTRY *p=nthfile(romindex+row);
+	int success=0;
 	if(p)
 	{
 		copyname(longfilename,p->Name,11); // Make use of the long filename buffer to store a temporary copy of the filename,
-		LoadROM(longfilename);	// since loading it by name will overwrite the sector buffer which currently contains it!
+		success=LoadROM(longfilename);	// since loading it by name will overwrite the sector buffer which currently contains it!
 	}
-	Menu_Set(topmenu);
-	Menu_Hide();
-	OSD_Show(0);
+	if(success)
+	{
+		Menu_Set(topmenu);
+		Menu_Hide();
+		OSD_Show(0);
+	}
+	else
+	{
+		Menu_Set(loaderror);
+		Menu_Show();
+		OSD_Show(1);
+	}
 }
 
 

@@ -315,9 +315,9 @@ signal FM_A 				: std_logic_vector(1 downto 0);
 signal FM_RNW				: std_logic;
 signal FM_UDS_N				: std_logic;
 signal FM_LDS_N				: std_logic;
-signal FM_DI				: std_logic_vector(15 downto 0);
-signal FM_DO				: std_logic_vector(15 downto 0);
-signal FM_DTACK_N			: std_logic;
+signal FM_DI				: std_logic_vector(7 downto 0);
+signal FM_DO				: std_logic_vector(7 downto 0);
+--signal FM_DTACK_N			: std_logic;
 
 signal TG68_FM_SEL		: std_logic;
 signal TG68_FM_D			: std_logic_vector(15 downto 0);
@@ -580,23 +580,23 @@ port map(
 	RST_N		=> MRST_N,
 	CLK			=> VCLK,
 
-	P1_UP		=> not JOY_1(3),
-	P1_DOWN	=> not JOY_1(2),
-	P1_LEFT	=> not JOY_1(1),
-	P1_RIGHT	=> not JOY_1(0),
-	P1_A		=> not JOY_1(4),
-	P1_B		=> not JOY_1(5),
-	P1_C		=> not JOY_1(6),
-	P1_START	=> not JOY_1(7),
+	P1_UP		=> not JOY_1(3) and gp1emu(0),
+	P1_DOWN	=> not JOY_1(2) and gp1emu(1),
+	P1_LEFT	=> not JOY_1(1) and gp1emu(2),
+	P1_RIGHT	=> not JOY_1(0) and gp1emu(3),
+	P1_A		=> not JOY_1(4) and gp1emu(4),
+	P1_B		=> not JOY_1(5) and gp1emu(5),
+	P1_C		=> not JOY_1(6) and gp1emu(6),
+	P1_START	=> not JOY_1(7) and gp1emu(7),
 		
-	P2_UP		=> not JOY_2(3),
-	P2_DOWN	=> not JOY_2(2),
-	P2_LEFT	=> not JOY_2(1),
-	P2_RIGHT	=> not JOY_2(0),
-	P2_A		=> not JOY_2(4),
-	P2_B		=> not JOY_2(5),
-	P2_C		=> not JOY_2(6),
-	P2_START	=> not JOY_2(7),
+	P2_UP		=> not JOY_2(3) and gp2emu(0),
+	P2_DOWN	=> not JOY_2(2) and gp2emu(1),
+	P2_LEFT	=> not JOY_2(1) and gp2emu(2),
+	P2_RIGHT	=> not JOY_2(0) and gp2emu(3),
+	P2_A		=> not JOY_2(4) and gp2emu(4),
+	P2_B		=> not JOY_2(5) and gp2emu(5),
+	P2_C		=> not JOY_2(6) and gp2emu(6),
+	P2_START	=> not JOY_2(7) and gp2emu(7),
 		
 	SEL		=> IO_SEL,
 	A			=> IO_A,
@@ -672,11 +672,11 @@ port map(
 	SEL		=> FM_SEL,
 	A			=> FM_A,
 	RNW		=> FM_RNW,
-	UDS_N		=> FM_UDS_N,
-	LDS_N		=> FM_LDS_N,
+--	UDS_N		=> FM_UDS_N,
+--	LDS_N		=> FM_LDS_N,
 	DI			=> FM_DI,
-	DO			=> FM_DO,
-	DTACK_N	=> FM_DTACK_N
+	DO			=> FM_DO
+--	DTACK_N	=> FM_DTACK_N
 );
 
 -- #############################################################################
@@ -1305,8 +1305,8 @@ begin
 		
 		FM_SEL <= '0';
 		FM_RNW <= '1';
-		FM_UDS_N <= '1';
-		FM_LDS_N <= '1';
+--		FM_UDS_N <= '1';
+--		FM_LDS_N <= '1';
 		FM_A <= (others => 'Z');
 		
 		FMC <= FMC_IDLE;
@@ -1321,58 +1321,73 @@ begin
 
 		case FMC is
 		when FMC_IDLE =>
-			if TG68_FM_SEL = '1' and TG68_FM_DTACK_N = '1' then
-				FM_SEL <= '1';
-				FM_A <= TG68_A(1 downto 0);
-				FM_RNW <= TG68_RNW;
-				FM_UDS_N <= TG68_UDS_N;
-				FM_LDS_N <= TG68_LDS_N;
-				FM_DI <= TG68_DO;
-				FMC <= FMC_TG68_ACC;
-			elsif T80_FM_SEL = '1' and T80_FM_DTACK_N = '1' then
-				FM_SEL <= '1';
-				FM_A <= T80_A(1 downto 0);
-				FM_RNW <= T80_WR_N;
-				if T80_A(0) = '0' then
-					FM_UDS_N <= '0';
-					FM_LDS_N <= '1';
-				else
-					FM_UDS_N <= '1';
-					FM_LDS_N <= '0';				
-				end if;
-				FM_DI <= T80_DO & T80_DO;
-				FMC <= FMC_T80_ACC;			
-			end if;
+			if VCLK='0' then
+				if TG68_FM_SEL = '1' and TG68_FM_DTACK_N = '1' then
+					FM_SEL <= '1';
+					FM_A <= TG68_A(1 downto 0);
+					FM_RNW <= TG68_RNW;
+					if TG68_A(0)='0' then
+						FM_DI <= TG68_DO(15 downto 8);
+					else
+						FM_DI <= TG68_DO(7 downto 0);
+					end if;
 
+	--				FM_UDS_N <= TG68_UDS_N;
+	--				FM_LDS_N <= TG68_LDS_N;
+	--				FM_DI <= TG68_DO(7 downto 0);
+					FMC <= FMC_TG68_ACC;
+				elsif T80_FM_SEL = '1' and T80_FM_DTACK_N = '1' then
+					FM_SEL <= '1';
+					FM_A <= T80_A(1 downto 0);
+					FM_RNW <= T80_WR_N;
+	--				if T80_A(0) = '0' then
+	--					FM_UDS_N <= '0';
+	--					FM_LDS_N <= '1';
+	--				else
+	--					FM_UDS_N <= '1';
+	--					FM_LDS_N <= '0';				
+	--				end if;
+					FM_DI <= T80_DO;
+					FMC <= FMC_T80_ACC;			
+				end if;
+			end if;
 		when FMC_TG68_ACC =>
-			if FM_DTACK_N = '0' then
+			-- sync this to 8MHz clock
+			if VCLK = '1' then
 				FM_SEL <= '0';
-				TG68_FM_D <= FM_DO;
+				TG68_FM_D <= (others=>'0');
+				if TG68_A(0)='0' then
+					TG68_FM_D(15 downto 8) <= FM_DO;
+				else
+					TG68_FM_D(7 downto 0) <= FM_DO;
+				end if;
+
 				TG68_FM_DTACK_N <= '0';
 				FMC <= FMC_DESEL;
 			end if;
 
 		when FMC_T80_ACC =>
-			if FM_DTACK_N = '0' then
+			-- sync this to 8MHz clock
+			if VCLK = '1' then
 				FM_SEL <= '0';
-				if T80_A(0) = '0' then
-					T80_FM_D <= FM_DO(15 downto 8);
-				else
-					T80_FM_D <= FM_DO(7 downto 0);
-				end if;
+--				if T80_A(0) = '0' then
+--					T80_FM_D <= FM_DO(15 downto 8);
+--				else
+					T80_FM_D <= FM_DO;
+--				end if;
 				T80_FM_DTACK_N <= '0';
 				FMC <= FMC_DESEL;
 			end if;
 
 		when FMC_DESEL =>
-			if FM_DTACK_N = '1' then
+--			if FM_DTACK_N = '1' then
 				FM_RNW <= '1';
-				FM_UDS_N <= '1';
-				FM_LDS_N <= '1';
+--				FM_UDS_N <= '1';
+--				FM_LDS_N <= '1';
 				FM_A <= (others => 'Z');
 
 				FMC <= FMC_IDLE;
-			end if;
+--			end if;
 			
 		when others => null;
 		end case;
