@@ -37,8 +37,8 @@ module jt12(
 	input			wr_n,	
 	
 	output	[7:0]	dout,	
-	output	[13:0]	right,
-	output	[13:0]	left,
+	output	[13:0]	snd_right,
+	output	[13:0]	snd_left,
     output			irq_n
 );
 
@@ -226,7 +226,7 @@ jt12_timers u_timers(
 	.overflow_A	( overflow_A	),
 	.irq_n		( irq_n			)
 );
-
+/*
 `ifndef TIMERONLY
 
 jt12_pg u_pg(
@@ -317,7 +317,7 @@ jt12_acc u_acc(
 	.left		( left		),
 	.right		( right		)
 );
-
+*/
 `ifdef SIMULATION
 reg [4:0] sep24_cnt;
 
@@ -366,6 +366,6 @@ sep24 #( .width(10), .pos0(5'd0)) egsep
 );
 `endif
 
-`endif
+//`endif
 
 endmodule

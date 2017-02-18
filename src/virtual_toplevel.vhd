@@ -40,7 +40,6 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.STD_LOGIC_TEXTIO.all;
 use IEEE.NUMERIC_STD.ALL;
 
-
 entity Virtual_Toplevel is
 	generic (
 		colAddrBits : integer := 9;
@@ -94,6 +93,19 @@ entity Virtual_Toplevel is
 end entity;
 
 architecture rtl of Virtual_Toplevel is
+component jt12 port(
+	rst	: in std_logic;
+	clk : in std_logic;
+	din : in std_logic_vector(7 downto 0);
+	addr: in std_logic_vector(1 downto 0);
+	cs_n: in std_logic;
+	wr_n: in std_logic;	
+	
+	dout: out std_logic_vector(7 downto 0);
+	snd_right:out std_logic_vector(13 downto 0);
+	snd_left:out std_logic_vector(13 downto 0);
+    irq_n:out std_logic );
+end component;
 
 -- "FLASH"
 signal romwr_req : std_logic := '0';
@@ -664,19 +676,17 @@ port map(
 );
 
 -- FM
-fm : entity work.gen_fm
+
+fm : jt12
 port map(
-	RST_N		=> T80_RESET_N,	-- gen-hw.txt line 328
-	CLK		=> VCLK,
+	rst		=> not T80_RESET_N,	-- gen-hw.txt line 328
+	clk		=> VCLK,
 		
-	SEL		=> FM_SEL,
-	A			=> FM_A,
-	RNW		=> FM_RNW,
---	UDS_N		=> FM_UDS_N,
---	LDS_N		=> FM_LDS_N,
-	DI			=> FM_DI,
-	DO			=> FM_DO
---	DTACK_N	=> FM_DTACK_N
+	cs_n	=> not FM_SEL,
+	addr	=> FM_A,
+	wr_n	=> FM_RNW,
+	din			=> FM_DI,
+	dout		=> FM_DO
 );
 
 -- #############################################################################
