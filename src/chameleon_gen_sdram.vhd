@@ -32,6 +32,7 @@ entity chameleon_sdram is
 		rowAddrBits : integer := 12;
 
 		-- Controller settings
+		writeBurst : boolean := false;  -- Warning: Set to True if using the cache port!
 		initTimeout : integer := 10000;
 	-- SDRAM timing
 		casLatency : integer := 3;
@@ -176,6 +177,7 @@ architecture rtl of chameleon_sdram is
 		
 		RAM_ACTIVE,
 		RAM_READ_1,
+		RAM_READ_TERMINATEBURST,
 		RAM_READ_2,
 		RAM_READ_3,
 		RAM_READ_4,
@@ -288,6 +290,7 @@ architecture rtl of chameleon_sdram is
 	signal currentWrData : unsigned(63 downto 0);
 	signal currentLdqm : std_logic;
 	signal currentUdqm : std_logic;
+	signal currentBurst : std_logic;
 
 	signal nextRamBank : unsigned(1 downto 0);
 	signal nextRamRow : row_t;
@@ -296,6 +299,7 @@ architecture rtl of chameleon_sdram is
 	signal nextRamState : ramStates;
 	signal nextLdqm : std_logic;
 	signal nextUdqm : std_logic;
+	signal nextBurst : std_logic;
 
 	
 	signal hv_a : std_logic_vector(13 downto 0);
@@ -364,6 +368,7 @@ begin
 				if romwr_we = '1' then
 					nextRamState <= RAM_WRITE_1;
 				end if;
+				nextBurst <= '0';
 				nextRamPort <= PORT_ROMWR;
 				nextRamBank <= romwr_a((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 				nextRamRow <= romwr_a((colAddrBits+rowAddrBits) downto (colAddrBits+1));
@@ -376,6 +381,7 @@ begin
 					nextLdqm <= vram_l_n;
 					nextUdqm <= vram_u_n;
 				end if;
+				nextBurst <= '0';
 				nextRamPort <= PORT_VRAM;
 				nextRamBank <= vram_a((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 				nextRamRow <= vram_a((colAddrBits+rowAddrBits) downto (colAddrBits+1));
@@ -384,6 +390,7 @@ begin
 			elsif (romrd_req /= romrd_ackReg) and (currentPort /= PORT_ROMRD) then
 				nextRamState <= RAM_READ_1;
 				nextRamPort <= PORT_ROMRD;
+				nextBurst <= '1';
 				nextRamBank <= romrd_a((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 				nextRamRow <= romrd_a((colAddrBits+rowAddrBits) downto (colAddrBits+1));
 				nextRamCol <= romrd_a(colAddrBits downto 3) & "00";
@@ -395,6 +402,7 @@ begin
 					nextLdqm <= ram68k_l_n;
 					nextUdqm <= ram68k_u_n;
 				end if;
+				nextBurst <= '0';
 				nextRamPort <= PORT_RAM68K;
 				nextRamBank <= ram68k_a((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 				nextRamRow <= ram68k_a((colAddrBits+rowAddrBits) downto (colAddrBits+1));
@@ -407,6 +415,7 @@ begin
 					nextLdqm <= cpu6510_a(0);
 					nextUdqm <= not cpu6510_a(0);
 				end if;
+				nextBurst <= '0';
 				nextRamPort <= PORT_CPU6510;
 				nextRamBank <= cpu6510_a((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 				nextRamRow <= cpu6510_a((colAddrBits+rowAddrBits) downto (colAddrBits+1));
@@ -420,6 +429,7 @@ begin
 				if cache_burst = '1' then
 					nextRamCol(1 downto 0) <= "00";
 				end if;
+				nextBurst <= cache_burst;  -- FIXME - AMR - untested
 
 				nextRamState <= RAM_READ_1;
 				if cache_we = '1' then
@@ -437,6 +447,7 @@ begin
 						nextLdqm <= reuA(0);
 						nextUdqm <= not reuA(0);
 					end if;
+					nextBurst <= '0';
 					nextRamPort <= PORT_REU;
 					nextRamBank <= reuA((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 					nextRamRow <= reuA((colAddrBits+rowAddrBits) downto (colAddrBits+1));
@@ -448,6 +459,7 @@ begin
 						nextLdqm <= cpu1541_a(0);
 						nextUdqm <= not cpu1541_a(0);
 					end if;
+					nextBurst <= '0';
 					nextRamPort <= PORT_CPU_1541;
 					nextRamBank <= cpu1541_a((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 					nextRamRow <= cpu1541_a((colAddrBits+rowAddrBits) downto (colAddrBits+1));
@@ -458,15 +470,18 @@ begin
 					nextRamBank <= vicvid_addr((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 					nextRamRow <= vicvid_addr((colAddrBits+rowAddrBits) downto (colAddrBits+1));
 					nextRamCol <= vicvid_addr(colAddrBits downto 3) & "00";
+					nextBurst <= '1'; -- FIXME - AMR - untested
 				elsif (vid0_req /= vid0_ackReg) and (currentPort /= PORT_VID0) then
 					nextRamState <= RAM_READ_1;
 					nextRamPort <= PORT_VID0;
+					nextBurst <= '1';
 					nextRamBank <= vid0_addr((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 					nextRamRow <= vid0_addr((colAddrBits+rowAddrBits) downto (colAddrBits+1));
 					nextRamCol <= vid0_addr(colAddrBits downto 3) & "00";
 				elsif vid1_pending = '1' then
 					nextRamState <= RAM_READ_1;
 					nextRamPort <= PORT_VID1;
+					nextBurst <= '1';
 					nextRamBank <= vid1_addr((colAddrBits+rowAddrBits+2) downto (colAddrBits+rowAddrBits+1));
 					nextRamRow <= vid1_addr((colAddrBits+rowAddrBits) downto (colAddrBits+1));
 					nextRamCol <= vid1_addr(colAddrBits downto 3) & "00";
@@ -551,7 +566,12 @@ begin
 					-- Set mode bits of RAM.
 					ramTimer <= 10;
 					ramState <= RAM_IDLE; -- ram is ready for commands after set-mode
-					sd_addr_reg <= resize("000000100010", sd_addr'length); -- CAS2, Burstlength 4 (8 bytes, 64 bits)
+					if writeBurst=true then
+						sd_addr_reg <= resize("000000100010", sd_addr'length); -- CAS2, Burstlength 4 (8 bytes, 64 bits)
+					else
+						sd_addr_reg <= resize("001000100010", sd_addr'length); -- CAS2, Burstlength 4 (8 bytes, 64 bits), no burst on writes
+					end if;
+
 					if casLatency = 3 then
 						sd_addr_reg(6 downto 4) <= "011";
 					end if;
@@ -570,6 +590,7 @@ begin
 						currentCol <= nextRamCol;
 						currentLdqm <= nextLdqm;
 						currentUdqm <= nextUdqm;
+						currentBurst <= nextBurst;
 						
 						case nextRamPort is
 						when PORT_CACHE =>
@@ -634,15 +655,30 @@ begin
 					bankRow(to_integer(currentBank)) <= currentRow;
 					bankActive(to_integer(currentBank)) <= '1';
 				when RAM_READ_1 =>
-					ramTimer <= casLatency + 1;
-					ramState <= RAM_READ_2;
+					if currentBurst='1' then
+						ramTimer <= casLatency + 1;
+						ramState <= RAM_READ_2;
+					else
+						ramState <= RAM_READ_TERMINATEBURST;
+					end if;
 					sd_addr_reg <= resize(currentCol, sd_addr'length);
 					--GE sd_addr_reg <= resize(currentCol, sd_addr'length) or resize("10000000000", sd_addr'length); --GE Auto precharge
 					sd_cas_n_reg <= '0';
 					sd_ba_0_reg <= currentBank(0);
 					sd_ba_1_reg <= currentBank(1);
+				when RAM_READ_TERMINATEBURST =>
+					ramTimer <= casLatency;
+					ramState <= RAM_READ_2;
+					sd_we_n_reg <= '0';	-- Terminate Burst
+					sd_ba_0_reg <= currentBank(0);
+					sd_ba_1_reg <= currentBank(1);
 				when RAM_READ_2 =>
-					ramState <= RAM_READ_3;
+					if currentBurst='1' then
+						ramState <= RAM_READ_3;
+					else
+						ramDone <='1';
+						ramState <= RAM_IDLE;
+					end if;
 					currentRdData(15 downto 0) <= ram_data_reg;
 					case currentPort is
 					when PORT_CPU6510 =>
@@ -650,28 +686,22 @@ begin
 						if cpu6510_a(0) = '1' then
 							cpu6510_qReg <= ram_data_reg(15 downto 8); --GE
 						end if;
-						ramDone <= '1';
 					when PORT_REU =>
 						reuQ <= ram_data_reg(7 downto 0);
 						if reuA(0) = '1' then
 							reuQ <= ram_data_reg(15 downto 8);
 						end if;
-						ramDone <= '1';
 					when PORT_CPU_1541 =>
 						cpu1541_q <= ram_data_reg(7 downto 0);
 						if cpu1541_a(0) = '1' then
 							cpu1541_q <= ram_data_reg(15 downto 8);
 						end if;
-						ramDone <= '1';
 					when PORT_ROMWR => --GE
 						romwr_qReg <= ram_data_reg;
-						ramDone <= '1';
 					when PORT_RAM68K => --GE
 						ram68k_qReg <= ram_data_reg;
-						ramDone <= '1';
 					when PORT_VRAM => --GE
 						vram_qReg <= ram_data_reg;
-						ramDone <= '1';						
 					when others =>
 						null;
 					end case;
@@ -709,14 +739,19 @@ begin
 					sd_ldqm_reg <= currentLdqm;
 					sd_udqm_reg <= currentUdqm;
 -- /!\
-					if currentLdqm = '1'
-					or currentUdqm = '1' 
-					or currentPort = PORT_ROMWR --GE
-					or currentPort = PORT_RAM68K --GE
-					or currentPort = PORT_VRAM --GE					
-					then
-						-- This is a partial write, abort burst.
-						ramState <= RAM_WRITE_ABORT;
+					if writeBurst=false then	-- Are we writing in single word mode?
+						ramState<=RAM_IDLE;
+						ramDone<='1';
+					else
+						if currentLdqm = '1'
+						or currentUdqm = '1' 
+						or currentPort = PORT_ROMWR --GE
+						or currentPort = PORT_RAM68K --GE
+						or currentPort = PORT_VRAM --GE					
+						then
+							-- This is a partial write, abort burst.
+							ramState <= RAM_WRITE_ABORT;
+						end if;
 					end if;
 				when RAM_WRITE_2 =>
 					ramState <= RAM_WRITE_3;
