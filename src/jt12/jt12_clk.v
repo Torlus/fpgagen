@@ -31,19 +31,17 @@ module jt12_clk(
 	input		set_n3,
 	input		set_n2,
 	
-	output	reg	clk_int,
+	output		clk_int,
 	output	reg rst_int
 );
 
 reg	clk_n2, clk_n3, clk_n6;
 
 // Dirty clock mux, might generate glitches:
-always @(*)
-	casex ( {set_n6, set_n3, set_n2 } )
-		default: clk_int <= clk_n6;
-		3'b01x: clk_int <= clk_n3;
-		3'b001: clk_int <= clk_n2;
-	endcase
+//assign clk_int = (set_n6&clk_n6) | (set_n3&clk_n3) | (set_n2&clk_n2);
+assign clk_int = clk_n6;
+//always @(posedge clk_n6 or posedge rst)
+//	clk_int <= rst ? 1'b0 : ~clk_int;
 
 // n=2
 // Generate internal clock and synchronous reset for it.

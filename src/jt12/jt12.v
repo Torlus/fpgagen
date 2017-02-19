@@ -24,7 +24,7 @@
 
 	Author: Jose Tejada Gomez. Twitter: @topapate
 	Version: 1.0
-	Date: 27-1-2017	
+	Date: 27-1-2017
 
 */
 
@@ -34,12 +34,12 @@ module jt12(
 	input	[7:0]	din,
 	input	[1:0]	addr,
 	input			cs_n,
-	input			wr_n,	
-	
-	output	[7:0]	dout,	
+	input			wr_n,
+
+	output	[7:0]	dout,
 	output	[13:0]	snd_right,
 	output	[13:0]	snd_left,
-    output			irq_n
+	output			irq_n
 );
 
 wire			zero; // Single-clock pulse at the begginig of s1_enters
@@ -47,7 +47,7 @@ wire			zero; // Single-clock pulse at the begginig of s1_enters
 wire	[2:0]	lfo_freq;
 wire			lfo_en;
 // Operators
-wire			amsen_VII;    
+wire			amsen_VII;
 wire	[ 2:0]	dt1_II;
 wire	[ 3:0]	mul_V;
 wire	[ 6:0]	tl_VII;
@@ -91,7 +91,7 @@ wire			flag_A, flag_B;
 // Operator
 wire			use_internal_x, use_internal_y;
 wire			use_prevprev1, use_prev2, use_prev1;
-wire	[ 9:0]	phase_VIII;	
+wire	[ 9:0]	phase_VIII;
 wire 			s1_enters, s2_enters, s3_enters, s4_enters;
 wire			set_n2, set_n3, set_n6;
 wire			clk_int, rst_int;
@@ -114,11 +114,11 @@ jt12_clksync u_clksync(
 	.flag_B		( flag_B	),
 	.cs_n		( cs_n		),
 	.wr_n		( wr_n		),
-	
+
 	.set_n6		( set_n6	),
 	.set_n3		( set_n3	),
 	.set_n2		( set_n2	),
-	
+
 	.clk_int	( clk_int	),
 	.rst_int	( rst_int	),
 	.din_s		( din_s		),
@@ -126,7 +126,20 @@ jt12_clksync u_clksync(
 	.dout		( dout		),
 	.write		( write		)
 );
-	
+
+reg  	ovA;
+reg		ovA_long;
+
+always @(posedge clk) begin
+	ovA <= overflow_A;
+	ovA_long <= |{ovA, overflow_A};
+end
+
+reg ovA_int;
+
+always @(posedge clk_int)
+	ovA_int <= ovA_long;
+
 jt12_mmr u_mmr(
 	.rst		( rst_int	),
 	.clk		( clk_int	),		// Phi 1
@@ -134,11 +147,11 @@ jt12_mmr u_mmr(
 	.write		( write		),
 	.addr		( addr_s	),
 	.busy		( busy		),
-	
+
 	// Clock speed
 	.set_n6		( set_n6	),
 	.set_n3		( set_n3	),
-	.set_n2		( set_n2	),	
+	.set_n2		( set_n2	),
 	// LFO
 	.lfo_freq	( lfo_freq	),
 	.lfo_en		( lfo_en	),
@@ -156,36 +169,36 @@ jt12_mmr u_mmr(
 	.set_run_A	( set_run_A		),
 	.set_run_B	( set_run_B		),
 	.flag_A		( flag_A		),
+	.overflow_A	( ovA_int		),
 	// PCM
 	.pcm		( pcm			),
 	.pcm_en		( pcm_en		),
 
-	`ifdef TEST_SUPPORT		
+	`ifdef TEST_SUPPORT
 	// Test
 	.test_eg	( test_eg		),
 	.test_op0	( test_op0		),
 	`endif
-    // Operator
+	// Operator
 	.use_prevprev1	( use_prevprev1		),
 	.use_internal_x	( use_internal_x	),
-	.use_internal_y	( use_internal_y	),	
+	.use_internal_y	( use_internal_y	),
 	.use_prev2		( use_prev2		),
-	.use_prev1		( use_prev1		),    
+	.use_prev1		( use_prev1		),
 	// PG
 	.fnum_I		( fnum_I	),
-	.block_I	( block_I	),	
+	.block_I	( block_I	),
 	// REG
 	.rl			( rl		),
 	.fb_II		( fb_II		),
 	.alg		( alg		),
 	.pms		( pms		),
 	.ams_VII	( ams_VII	),
-	.amsen_VII	( amsen_VII	),    
+	.amsen_VII	( amsen_VII	),
 	.dt1_II		( dt1_II	),
 	.mul_V		( mul_V		),
 	.tl_VII		( tl_VII	),
 
-	.keycode_III( keycode_III	),
 	.ar_II		( ar_II		),
 	.d1r_II		( d1r_II	),
 	.d2r_II		( d2r_II	),
@@ -195,7 +208,7 @@ jt12_mmr u_mmr(
 	// SSG operation
 	.ssg_en_II	( ssg_en_II	),
 	.ssg_eg_II	( ssg_eg_II	),
-        
+
 	.keyon_II	( keyon_II	),
 	.keyoff_II	( keyoff_II	),
 	// Operator
@@ -220,13 +233,13 @@ jt12_timers u_timers(
 	.set_run_A	( set_run_A		),
 	.set_run_B	( set_run_B		),
 	.clr_run_A	( clr_run_A		),
-	.clr_run_B	( clr_run_B		),	
+	.clr_run_B	( clr_run_B		),
 	.flag_A		( flag_A		),
 	.flag_B		( flag_B		),
 	.overflow_A	( overflow_A	),
 	.irq_n		( irq_n			)
 );
-/*
+
 `ifndef TIMERONLY
 
 jt12_pg u_pg(
@@ -272,7 +285,7 @@ jt12_eg u_eg(
 	.tl_VII			( tl_VII		),
 	.ams_VII		( ams_VII		),
 	.amsen_VII		( amsen_VII		),
-	
+
 	.eg_IX			( eg_IX 		),
 	.pg_rst			( pg_rst 		)
 );
@@ -310,14 +323,14 @@ jt12_acc u_acc(
 	.s1_enters	( s2_enters ),
 	.s2_enters	( s1_enters ),
 	.s3_enters	( s4_enters ),
-	.s4_enters	( s3_enters ),	
+	.s4_enters	( s3_enters ),
 	.pcm_en		( pcm_en	),	// only enabled for channel 6
 	.pcm		( pcm		),
 	.alg		( alg		),
-	.left		( left		),
-	.right		( right		)
+	.left		( snd_left	),
+	.right		( snd_right	)
 );
-*/
+
 `ifdef SIMULATION
 reg [4:0] sep24_cnt;
 
@@ -334,8 +347,8 @@ sep24 #( .width(10), .pos0(5'd0)) egsep
 	.clk	( clk_int	),
 	.mixed	( eg_IX		),
 	.mask	( 0			),
-	.cnt	( sep24_cnt	),	
-	
+	.cnt	( sep24_cnt	),
+
 	.ch0s1 (eg_ch0s1), 
 	.ch1s1 (eg_ch1s1), 
 	.ch2s1 (eg_ch2s1), 
@@ -366,6 +379,6 @@ sep24 #( .width(10), .pos0(5'd0)) egsep
 );
 `endif
 
-//`endif
+`endif
 
 endmodule

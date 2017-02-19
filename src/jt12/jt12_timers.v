@@ -1,26 +1,26 @@
 /*  This file is part of JT12.
 
-    JT12 is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	JT12 is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    JT12 is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	JT12 is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with JT12.  If not, see <http://www.gnu.org/licenses/>.
-	
+	You should have received a copy of the GNU General Public License
+	along with JT12.  If not, see <http://www.gnu.org/licenses/>.
+
 	Author: Jose Tejada Gomez. Twitter: @topapate
 	Version: 1.0
 	Date: 14-2-2017
-		
+
 	Timer A = 72*(1024-NA)/Phi M
 	Timer B = 1152*(256-NB)/Phi M
 	*/
-	
+
 `timescale 1ns / 1ps
 
 module jt12_timers(
@@ -50,7 +50,7 @@ jt12_timer #(.mult_width(7), .mult_max(72), .counter_width(10))
 timer_A(
 	.clk		( clk		), 
 	.rst		( rst		),
-	.start_value( value_A	),	
+	.start_value( value_A	),
 	.load		( load_A   	),
 	.clr_flag   ( clr_flag_A),
 	.set_run	( set_run_A	),
@@ -63,7 +63,7 @@ jt12_timer #(.mult_width(11), .mult_max(1152), .counter_width(8))
 timer_B(
 	.clk		( clk		), 
 	.rst		( rst		),
-	.start_value( value_B	),	
+	.start_value( value_B	),
 	.load		( load_B   	),
 	.clr_flag   ( clr_flag_B),
 	.set_run	( set_run_B	),
@@ -95,7 +95,7 @@ always@(posedge clk)
 	if( clr_flag || rst)
 		flag <= 1'b0;
 	else if(overflow) flag<=1'b1;
-	
+
 always@(posedge clk)
 	if( clr_run || rst)
 		run <= 1'b0;
@@ -115,7 +115,7 @@ always @(posedge clk) begin : counter
 	if( load ) begin
 	  mult <= { (mult_width){1'b0} };
 	  cnt  <= start_value;
-	end		
+	end
 	else if( run )
 	  { cnt, mult } <= overflow ? init : next;
 end

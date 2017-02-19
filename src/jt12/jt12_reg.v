@@ -34,6 +34,7 @@ module jt12_reg(
 	
 	input				csm,
 	input				flag_A,
+	input				overflow_A,
 
 	input				up_keyon,	
 	input				up_alg,	
@@ -52,6 +53,14 @@ module jt12_reg(
 
 	output				busy,
     
+	// CH3 Effect-mode operation
+	input				effect,
+	input	[10:0]		fnum_ch3op2,
+	input	[10:0]		fnum_ch3op3, 
+	input	[10:0]		fnum_ch3op1,
+	input	[ 2:0]		block_ch3op2,
+	input	[ 2:0]		block_ch3op3,
+	input	[ 2:0]		block_ch3op1,
     // Pipeline order
 	output	reg			zero,
 	output 				s1_enters,
@@ -79,7 +88,6 @@ module jt12_reg(
 	output		[ 2:0]	dt1_II,
 	
 	// EG
-	output		[4:0]	keycode_III,
 	output		[4:0]	ar_II,	// attack  rate
 	output		[4:0]	d1r_II, // decay   rate
 	output		[4:0]	d2r_II, // sustain rate
@@ -95,9 +103,7 @@ module jt12_reg(
 
 	// envelope operation
 	output				keyon_II,
-	output				keyoff_II,
-        
-	output		[2:0]	cur_ch
+	output				keyoff_II
 );
 
 
@@ -116,6 +122,24 @@ always @(*) begin
 		2'd3: opch_I <= ch+5'd18;
 	endcase
 end
+
+// FNUM and BLOCK
+wire	[10:0]	fnum_I_raw;
+wire	[ 2:0]	block_I_raw;
+wire	effect_on_s1 = effect && (cur == 5'd02 );
+wire	effect_on_s3 = effect && (cur == 5'd08 );
+wire	effect_on_s2 = effect && (cur == 5'd14 );
+wire	noeffect     = ~|{effect_on_s1, effect_on_s3, effect_on_s2};
+assign fnum_I = ( {11{effect_on_s1}} & fnum_ch3op1 ) |
+				( {11{effect_on_s2}} & fnum_ch3op2 ) |
+				( {11{effect_on_s3}} & fnum_ch3op3 ) |
+				( {11{noeffect}}     & fnum_I_raw  );
+
+assign block_I =( {3{effect_on_s1}} & block_ch3op1 ) |
+				( {3{effect_on_s2}} & block_ch3op2 ) |
+				( {3{effect_on_s3}} & block_ch3op3 ) |
+				( {3{noeffect}}     & block_I_raw  );
+
 
 jt12_mod24 u_opch_II ( .base(opch_I), .extra(3'd1), .mod(opch_II)  );
 jt12_mod24 u_opch_III( .base(opch_I), .extra(3'd2), .mod(opch_III) );
@@ -240,6 +264,9 @@ jt12_kon u_kon(
 	.keyon_ch	( keyon_ch	),
 	.next_slot	( next		),
 	.up_keyon	( up_keyon	),
+	.csm		( csm		),
+	.flag_A		( flag_A	),
+	.overflow_A	( overflow_A),
 	
 	.keyon_II	( keyon_II	),
 	.keyoff_II	( keyoff_II	),
@@ -305,15 +332,15 @@ jt12_sh #(.width(regop_width),.stages(24)) u_regop(
 parameter regch_width=27;
 wire [regch_width-1:0] regch_out;
 wire [regch_width-1:0] regch_in = { 
-	up_block_ch	? { block_in, fnhi_in } : { block_I, fnum_I[10:8] }, // 3+3
-	up_fnumlo_ch?   fnlo_in : fnum_I[7:0], // 8	
+	up_block_ch	? { block_in, fnhi_in } : { block_I_raw, fnum_I_raw[10:8] }, // 3+3
+	up_fnumlo_ch?   fnlo_in : fnum_I_raw[7:0], // 8	
 	up_alg_ch	? { fb_in, alg_in } : { fb_I, alg },//3+3
 	//up_alg_ch	? alg_in : alg,//3+3
 	//up_fb_ch	? fb_in  : fb_II,//3+3
 	up_pms_ch	? { rl_in, ams_in, pms_in } : { rl, ams_VII, pms }//2+2+3
 }; 
 		
-assign { block_I, fnum_I, fb_I, alg, rl, ams_VII, pms } = regch_out;
+assign { block_I_raw, fnum_I_raw, fb_I, alg, rl, ams_VII, pms } = regch_out;
 
 jt12_sh #(.width(regch_width),.stages(6)) u_regch(
 	.clk	( clk		),
