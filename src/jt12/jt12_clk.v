@@ -45,7 +45,7 @@ assign clk_n6 = clkgen[5];
 always @(posedge clk or posedge rst) 
 begin
 	if ( rst ) begin
-		clkgen<=6'b111000;
+		clkgen<=6'b000111;
 	end
 	else begin
 		clkgen[0]<=clkgen[5];
