@@ -686,8 +686,13 @@ port map(
 	addr	=> FM_A,
 	wr_n	=> FM_RNW,
 	din			=> FM_DI,
-	dout		=> FM_DO
+	dout		=> FM_DO,
+	snd_left	=> DAC_LDATA(15 downto 2),
+	snd_right	=> DAC_RDATA(15 downto 2)
 );
+
+DAC_LDATA(1 downto 0) <= "00";
+DAC_RDATA(1 downto 0) <= "00";
 
 -- #############################################################################
 -- #############################################################################
