@@ -35,20 +35,23 @@ module jt12_clk(
 	output	reg rst_int
 );
 
-reg	clk_n2, clk_n3, clk_n6;
+reg [5:0] clkgen;
 
-// Dirty clock mux, might generate glitches:
-//assign clk_int = (set_n6&clk_n6) | (set_n3&clk_n3) | (set_n2&clk_n2);
-assign clk_int = clk_n6;
-//always @(posedge clk_n6 or posedge rst)
-//	clk_int <= rst ? 1'b0 : ~clk_int;
-
-// n=2
-// Generate internal clock and synchronous reset for it.
+wire clk_n6;
 reg	rst_int_aux;
 
+assign clk_int = clk_n6;
+assign clk_n6 = clkgen[5];
 always @(posedge clk or posedge rst) 
-	clk_n2 	<= rst ? 1'b0 : ~clk_n2;
+begin
+	if ( rst ) begin
+		clkgen<=6'b111000;
+	end
+	else begin
+		clkgen[0]<=clkgen[5];
+		clkgen[5:1]<=clkgen[4:0];
+	end
+end
 
 always @(posedge clk_n6 or posedge rst) 
 	if( rst ) begin
@@ -60,25 +63,51 @@ always @(posedge clk_n6 or posedge rst)
 		rst_int		<= rst_int_aux;
 	end
 
-// n=3
 
-reg A,B,C;
-
-always @(posedge clk) 
-	if( rst ) {A,B} <= 2'b0;
-	else {A,B} <= {~A & ~B, A};
-
-
-always @(negedge clk)
-	C <= rst ? 1'b0 : B;
-	
-always @(*)
-	clk_n3 <= C | B;
-	
-// n=6
-
-always @(posedge clk_n3 or posedge rst)
-	clk_n6 	<= rst ? 1'b0 : ~clk_n6;
+//reg	clk_n2, clk_n3, clk_n6;
+//
+//// Dirty clock mux, might generate glitches:
+////assign clk_int = (set_n6&clk_n6) | (set_n3&clk_n3) | (set_n2&clk_n2);
+//assign clk_int = clk_n6;
+////always @(posedge clk_n6 or posedge rst)
+////	clk_int <= rst ? 1'b0 : ~clk_int;
+//
+//// n=2
+//// Generate internal clock and synchronous reset for it.
+//reg	rst_int_aux;
+//
+//always @(posedge clk or posedge rst) 
+//	clk_n2 	<= rst ? 1'b0 : ~clk_n2;
+//
+//always @(posedge clk_n6 or posedge rst) 
+//	if( rst ) begin
+//		rst_int_aux	<= 1'b1;
+//		rst_int		<= 1'b1;
+//	end
+//	else begin
+//		rst_int_aux	<= 1'b0;
+//		rst_int		<= rst_int_aux;
+//	end
+//
+//// n=3
+//
+//reg A,B,C;
+//
+//always @(posedge clk) 
+//	if( rst ) {A,B} <= 2'b0;
+//	else {A,B} <= {~A & ~B, A};
+//
+//
+//always @(negedge clk)
+//	C <= rst ? 1'b0 : B;
+//	
+//always @(*)
+//	clk_n3 <= C | B;
+//	
+//// n=6
+//
+//always @(posedge clk_n3 or posedge rst)
+//	clk_n6 	<= rst ? 1'b0 : ~clk_n6;
 
 
 endmodule
