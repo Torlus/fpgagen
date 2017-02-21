@@ -102,8 +102,11 @@ module jt12_mmr(
 );
 
 reg [7:0]	selected_register;
+reg			selected_map;
 
-//reg		sch; // 0 => CH1~CH3 only available. 1=>CH4~CH6
+reg		sch; // 0 => CH1~CH3 only available. 1=>CH4~CH6
+reg		irq_zero_en, irq_brdy_en, irq_eos_en, 
+		irq_tb_en, irq_ta_en;
 reg		up_clr;
 reg 	up_alg; 
 
@@ -130,6 +133,7 @@ parameter 	REG_TEST	=	8'h01,
 			REG_CLKB	=	8'h26,
 			REG_TIMER	=	8'h27,
 			REG_KON		=	8'h28,
+			REG_IRQMASK =	8'h29,
 			REG_PCM 	=	8'h2A,
 			REG_PCM_EN	=	8'h2B,
 			REG_CLK_N6	=	8'h2D,
@@ -151,6 +155,7 @@ reg [7:0] din_latch;
 always @(posedge clk) begin : memory_mapped_registers
 	if( rst ) begin
 		selected_register 	<= 8'h0;
+		selected_map		<= 1'b0;
 		busy				<= 1'b0;
 		up_ch				<= 3'd0;
 		up_op				<= 2'd0;
@@ -160,6 +165,9 @@ always @(posedge clk) begin : memory_mapped_registers
 		`ifdef TEST_SUPPORT
 		{ test_eg, test_op0 } <= 2'd0;
 		`endif
+		// IRQ Mask
+		{ irq_zero_en, irq_brdy_en, irq_eos_en, 
+			irq_tb_en, irq_ta_en } = 5'h1f;
 		// timers
 		{ value_A, value_B } <= 18'd0;
 		{ clr_flag_B, clr_flag_A, 
@@ -178,13 +186,14 @@ always @(posedge clk) begin : memory_mapped_registers
 		set_n6		<= 1'b1;
 		set_n3		<= 1'b0;
 		set_n2		<= 1'b0;
-		//sch			<= 1'b0;
+		sch			<= 1'b0;
 	end else begin
 		// WRITE IN REGISTERS
 		if( write && !busy ) begin
 			busy <= 1'b1;
 			if( !addr[0] ) begin
 				selected_register <= din;
+				selected_map	  <= addr[1];
 				up_ch	<= din[1:0]+ (addr[1] ? 2'b11 : 2'b0);
 				up_op	<= din[3:2]; // 0=S1,1=S3,2=S2,3=S4
 			end else begin
@@ -215,9 +224,13 @@ always @(posedge clk) begin : memory_mapped_registers
 					REG_LFO:	{ lfo_en, lfo_freq } <= din[3:0];
 					REG_PCM:	pcm		<= din;
 					REG_PCM_EN:	pcm_en	<= din[7];
-					REG_CLK_N6:	{ set_n6, set_n3, set_n2 } <= 3'b100;
-					REG_CLK_N3:	{ set_n6, set_n3, set_n2 } <= 3'b010;
-					REG_CLK_N2:	{ set_n6, set_n3, set_n2 } <= 3'b001;
+					//REG_CLK_N6:	{ set_n6, set_n3, set_n2 } <= 3'b100;
+					//REG_CLK_N3:	{ set_n6, set_n3, set_n2 } <= 3'b010;
+					//REG_CLK_N2:	{ set_n6, set_n3, set_n2 } <= 3'b001;
+					REG_IRQMASK: { sch, irq_zero_en,
+						irq_brdy_en,
+						irq_eos_en, 
+						irq_tb_en, irq_ta_en } <= { din[7], din[4:0] };
 					endcase
 				end 
                 else if( selected_register[1:0]!=2'b11 ) begin
