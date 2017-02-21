@@ -395,7 +395,7 @@ wire [9:0] phase_ch0s1, phase_ch1s1, phase_ch2s1, phase_ch3s1,
 		 phase_ch2s4, phase_ch3s4, phase_ch4s4, phase_ch5s4;
 
 
-sep24 #( .width(10), .pos0( 20 ) ) phsep
+sep24 #( .width(10), .pos0( 18 ) ) phsep
 (
 	.clk	( clk_int	),
 	.mixed	( phase		),

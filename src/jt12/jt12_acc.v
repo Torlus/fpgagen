@@ -85,8 +85,13 @@ always @(posedge clk) begin
 		end
         if( s2_enters ) begin
         	sum_all <= 1'b0;
-            left <= pre_left;
-            right <= pre_right;
+            left <= pre_left[13:11]==3'b000 || pre_left[13:11]==3'b111 ?
+				{ pre_left[13], pre_left[10:0], 2'b0 } : {14{pre_left[13]}};
+            right <= pre_right[13:11]==3'b000 || pre_right[13:11]==3'b111 ?
+				{ pre_right[13], pre_right[10:0], 2'b0 } : {14{pre_right[13]}};
+            `ifdef DUMPSOUND
+            $strobe("%d\t%d", left, right);
+            `endif
         end
     end
 end
@@ -97,7 +102,8 @@ always @(*) begin
 	op_signext <= { {3{op_result[8]}}, op_result };
 	if( s3_enters )
 		next <= pcm_en ? {4'd0, pcm} : {12{sum_en}} & op_signext;
-	else next <= ( sum_en&&!pcm_en ? op_signext : 12'd0 ) + total;	
+	else 
+		next <= ( sum_en ? op_signext : 12'd0 ) + total;	
 end
 
 jt12_sh #(.width(11),.stages(6)) buffer(

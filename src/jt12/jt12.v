@@ -66,7 +66,7 @@ wire	[2:0]	ssg_eg_II;
 wire			keyon;
 wire			keyoff;
 wire	[9:0]	eg_IX;
-wire			pg_rst;
+wire			pg_rst_III;
 // Channel
 wire	[10:0]	fnum_I;
 wire	[ 2:0]	block_I;
@@ -127,6 +127,7 @@ jt12_clksync u_clksync(
 	.write		( write		)
 );
 
+wire	overflow_A;
 reg  	ovA;
 reg		ovA_long;
 
@@ -253,7 +254,7 @@ jt12_pg u_pg(
 	.dt1_II		( dt1_II 		), // same as JT51's DT1
 	// phase operation
 	.keyon_II	( keyon_II 		),
-	.pg_rst		( pg_rst | rst_int ),
+	.pg_rst_III	( pg_rst_III | rst_int ),
 	.zero		( zero			),
 	.keycode_III( keycode_III	),
 	.phase_VIII	( phase_VIII 	)
@@ -287,7 +288,7 @@ jt12_eg u_eg(
 	.amsen_VII		( amsen_VII		),
 
 	.eg_IX			( eg_IX 		),
-	.pg_rst			( pg_rst 		)
+	.pg_rst_III		( pg_rst_III	)
 );
 
 wire	[8:0]	op_result;

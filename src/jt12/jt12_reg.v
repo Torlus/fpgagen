@@ -109,7 +109,7 @@ module jt12_reg(
 
 reg	 [4:0] opch_I;
 wire [4:0] opch_II, opch_III, opch_IV, opch_V, opch_VI, opch_VII;
-
+reg	[4:0] next, cnt, cur;
 wire [2:0]	fb_I;
 
 always @(posedge clk) fb_II <= fb_I;
@@ -147,8 +147,6 @@ jt12_mod24 u_opch_IV ( .base(opch_I), .extra(3'd3), .mod(opch_IV)  );
 jt12_mod24 u_opch_V  ( .base(opch_I), .extra(3'd4), .mod(opch_V)   );
 jt12_mod24 u_opch_VI ( .base(opch_I), .extra(3'd5), .mod(opch_VI)  );
 jt12_mod24 u_opch_VII( .base(opch_I), .extra(3'd6), .mod(opch_VII) );
-
-reg	[4:0] next, cnt, cur;
 
 wire update_op_I  = cur == opch_I;
 wire update_op_II = cur == opch_II;

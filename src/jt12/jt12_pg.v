@@ -45,7 +45,7 @@ module jt12_pg(
 	//input		[ 7:0]	pm,
 	//input		[ 2:0]	pms,
 	// phase operation
-	input				pg_rst,
+	input				pg_rst_III,
 	input				keyon_II,
 	input				zero,
 	
@@ -78,6 +78,8 @@ jt12_pm u_pm(
 	.kcex(keycode_I)
 );
 */
+
+wire pg_rst_VI;
 
 //////////////////////////////////////////////////
 // I
@@ -196,7 +198,7 @@ reg  [19:0] phase_in;
 reg  [ 9:0] phase_VII;
 
 always @(*)
-	phase_in <= ( keyon_VI || pg_rst )? 20'd0 : phase_drop + phinc_VI;
+	phase_in <= ( keyon_VI || pg_rst_VI )? 20'd0 : phase_drop + phinc_VI;
 
 always @(posedge clk) begin : phase_calculation_VI
 	phase_VII <= phase_in[19:10];
@@ -227,6 +229,13 @@ jt12_sh #( .width(1), .stages(4) ) u_konsh(
 	.drop	( keyon_VI	)
 );
 
+jt12_sh #( .width(1), .stages(3) ) u_rstsh(
+	.clk	( clk		),
+	.din	( pg_rst_III),
+	.drop	( pg_rst_VI	)
+);
+
+
 
 `ifdef SIMULATION
 reg [4:0] sep24_cnt;
@@ -242,7 +251,7 @@ wire [9:0] pg_ch0s1, pg_ch1s1, pg_ch2s1, pg_ch3s1,
 always @(posedge clk_int)
 	sep24_cnt <= !zero ? sep24_cnt+1'b1 : 5'd0;
 
-sep24 #( .width(10), .pos0(3+8)) stsep
+sep24 #( .width(10), .pos0(18)) stsep
 (
 	.clk	( clk_int	),
 	.mixed	( phase_VIII),

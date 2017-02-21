@@ -232,50 +232,37 @@ always @(posedge clk) begin : memory_mapped_registers
 						irq_eos_en, 
 						irq_tb_en, irq_ta_en } <= { din[7], din[4:0] };
 					endcase
-				end else
-				// channel registers
-				if( selected_register >= 8'hA0 ) begin
-					case( selected_register[4:2] )
-						3'h0: begin
-							up_fnumlo	<= 1'b1;
-
-						end
-						3'h1: begin
-							up_block	<= 1'b1;
-						end
-						3'h2:
-							case( selected_register[1:0] )
-								2'd0: fnum_lo_ch3op3 <= din;
-								2'd1: fnum_lo_ch3op1 <= din;
-								2'd2: fnum_lo_ch3op2 <= din;
-							endcase
-						3'h3:
-							case( selected_register[1:0] )
-								2'd0: {block_ch3op3, fnum_hi_ch3op3 } <= din[5:0];
-								2'd1: {block_ch3op1, fnum_hi_ch3op1 } <= din[5:0];
-								2'd2: {block_ch3op2, fnum_hi_ch3op2 } <= din[5:0];
-							endcase
-						3'h4: begin
-							up_alg		<= 1'b1;
-						end
-						3'h5: begin
-							up_pms		<= 1'b1;
-						end
-					endcase
-				end
-				else 
-				// operator registers
-				begin
-					case( selected_register[7:4] )
-						4'h3: up_dt1 	<= 1'b1;
-						4'h4: up_tl		<= 1'b1;
-						4'h5: up_ks_ar	<= 1'b1;
-						4'h6: up_amen_d1r	<= 1'b1;
-						4'h7: up_d2r 	<= 1'b1;
-						4'h8: up_d1l 	<= 1'b1;
-						4'h9: up_ssgeg	<= 1'b1;
-					endcase
-				end
+				end 
+                else if( selected_register[1:0]!=2'b11 ) begin
+					// channel registers
+					if( selected_register >= 8'hA0 ) begin
+						case( selected_register )
+							8'hA0, 8'hA1, 8'hA2:	up_fnumlo	<= 1'b1;
+							8'hA4, 8'hA5, 8'hA6:	up_block	<= 1'b1;
+							8'hA9: fnum_lo_ch3op1 <= din;
+                            8'hA8: fnum_lo_ch3op3 <= din;
+                            8'hAA: fnum_lo_ch3op2 <= din;
+                            8'hAD: {block_ch3op1, fnum_hi_ch3op1 } <= din[5:0];
+							8'hAC: {block_ch3op3, fnum_hi_ch3op3 } <= din[5:0];
+                            8'hAE: {block_ch3op2, fnum_hi_ch3op2 } <= din[5:0];
+                            8'hB0, 8'hB1, 8'hB2:	up_alg		<= 1'b1;
+							8'hB4, 8'hB5, 8'hB6:	up_pms		<= 1'b1;
+						endcase
+					end
+					else 
+					// operator registers
+					begin
+						case( selected_register[7:4] )
+							4'h3: up_dt1 	<= 1'b1;
+							4'h4: up_tl		<= 1'b1;
+							4'h5: up_ks_ar	<= 1'b1;
+							4'h6: up_amen_d1r	<= 1'b1;
+							4'h7: up_d2r 	<= 1'b1;
+							4'h8: up_d1l 	<= 1'b1;
+							4'h9: up_ssgeg	<= 1'b1;
+						endcase
+					end
+                end
 			end
 		end
 		else begin /* clear once-only bits */

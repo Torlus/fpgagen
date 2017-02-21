@@ -71,7 +71,7 @@ module jt12_eg (
 	input				amsen_VII,
 	
 	output	reg	[9:0]	eg_IX,
-	output	reg			pg_rst
+	output	reg			pg_rst_III
 );
 
  // eg[9:6] -> direct attenuation (divide by 2)
@@ -86,7 +86,7 @@ wire ssg_hold_II = ssg_eg_II[0] & ssg_en_II;
 
 parameter ATTACK=3'd0, DECAY1=3'd1, DECAY2=3'd2, RELEASE=3'd3, HOLD=3'd4;
 
-reg		[4:0]	d1level;
+reg		[4:0]	d1level_II;
 reg		[2:0]	cnt_V;
 reg		[5:0]	rate_IV;
 reg		[9:0]	eg_III, eg_IV, eg_V, eg_VI;
@@ -152,9 +152,9 @@ end
 always @(posedge clk) begin
 	// I
 	if( d1l == 4'd15 )
-		d1level <= 5'h10; // 48dB 
+		d1level_II <= 5'h10; // 48dB 
 	else
-		d1level <= d1l;
+		d1level_II <= d1l;
 end
 
 //	Register Cycle II	
@@ -168,6 +168,7 @@ always @(posedge clk) begin
 	if( keyoff_II ) begin
 		cfg_III <= { rrate_II, 1'b1 };
 		state_III <= RELEASE;
+		pg_rst_III	<= 1'b0;
 	end
 	else begin
 		// trigger 1st decay
@@ -175,9 +176,10 @@ always @(posedge clk) begin
 			cfg_III <= arate_II;
 			state_III <= ATTACK;
 			keyon_III <= keyon_II;
+			pg_rst_III <= 1'b0;
 		end
 		else begin : sel_rate
-			pg_rst <= eg_II>=10'h200 && ssg_en_II &&
+			pg_rst_III <= eg_II>=10'h200 && ssg_en_II &&
 							 !( ssg_alt_II || ssg_hold_II );
 			case ( state_II )
 				ATTACK: begin
@@ -193,7 +195,7 @@ always @(posedge clk) begin
 					keyon_III <= keyon_II;
 					end
 				DECAY1: begin
-					if( eg_II[9:5] >= d1level ) begin
+					if( eg_II[9:5] >= d1level_II ) begin
 						cfg_III <= rate2_II;
 						state_III <= DECAY2;
 					end
