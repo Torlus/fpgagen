@@ -63,8 +63,8 @@ wire	[ 1:0]	ks_III;
 wire			ssg_en_II;
 wire	[2:0]	ssg_eg_II;
 // envelope operation
-wire			keyon;
-wire			keyoff;
+wire			keyon_II;
+wire			keyoff_II;
 wire	[9:0]	eg_IX;
 wire			pg_rst_III;
 // Channel
@@ -103,6 +103,7 @@ wire			test_eg, test_op0;
 
 wire	[7:0]	din_s;
 wire	[1:0]	addr_s;
+wire			busy, write;
 
 jt12_clksync u_clksync(
 	.rst		( rst		),

@@ -99,11 +99,11 @@ end
 reg [10:0] next;
             
 always @(*) begin
-	op_signext <= { {3{op_result[8]}}, op_result };
+	op_signext <= { {2{op_result[8]}}, op_result };
 	if( s3_enters )
-		next <= pcm_en ? {4'd0, pcm} : {12{sum_en}} & op_signext;
+		next <= pcm_en ? {3'd0, pcm} : {11{sum_en}} & op_signext;
 	else 
-		next <= ( sum_en ? op_signext : 12'd0 ) + total;	
+		next <= ( sum_en ? op_signext : 11'd0 ) + total;	
 end
 
 jt12_sh #(.width(11),.stages(6)) buffer(
