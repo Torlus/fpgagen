@@ -224,9 +224,9 @@ always @(posedge clk) begin : memory_mapped_registers
 					REG_LFO:	{ lfo_en, lfo_freq } <= din[3:0];
 					REG_PCM:	pcm		<= din;
 					REG_PCM_EN:	pcm_en	<= din[7];
-					//REG_CLK_N6:	{ set_n6, set_n3, set_n2 } <= 3'b100;
-					//REG_CLK_N3:	{ set_n6, set_n3, set_n2 } <= 3'b010;
-					//REG_CLK_N2:	{ set_n6, set_n3, set_n2 } <= 3'b001;
+					REG_CLK_N6:	{ set_n6, set_n3, set_n2 } <= 3'b100;
+					REG_CLK_N3:	{ set_n6, set_n3, set_n2 } <= 3'b010;
+					REG_CLK_N2:	{ set_n6, set_n3, set_n2 } <= 3'b001;
 					REG_IRQMASK: { sch, irq_zero_en,
 						irq_brdy_en,
 						irq_eos_en, 
