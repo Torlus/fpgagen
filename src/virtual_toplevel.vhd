@@ -225,6 +225,8 @@ signal T80_DO              : std_logic_vector(7 downto 0);
 
 -- CLOCK GENERATION
 signal VCLK			: std_logic;
+signal RST_VCLK	: std_logic; -- Reset for blocks using VCLK as clock
+signal RST_VCLK_aux : std_logic;
 signal VCLKCNT		: std_logic_vector(2 downto 0);
 -- signal VCLKCNT		: unsigned(2 downto 0);
 signal ZCLK			: std_logic := '0';
@@ -679,7 +681,7 @@ port map(
 
 fm : jt12
 port map(
-	rst		=> not T80_RESET_N,	-- gen-hw.txt line 328
+	rst		=> RST_VCLK,	-- gen-hw.txt line 328
 	clk		=> VCLK,
 		
 	cs_n	=> not FM_SEL,
@@ -777,6 +779,17 @@ INTERLACE <= '0';
 -- #############################################################################
 -- #############################################################################
 -- #############################################################################
+
+process( MRST_N, VCLK )
+begin
+	if MRST_N = '0' then
+		RST_VCLK <= '1';
+		RST_VCLK_aux <= '1';
+	elsif rising_edge(VCLK) then
+		RST_VCLK_aux <= '0';
+		RST_VCLK <= RST_VCLK_aux;
+	end if;
+end process;
 
 -- CLOCK GENERATION
 process( MRST_N, MCLK, VCLKCNT )
