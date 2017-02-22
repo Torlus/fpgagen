@@ -1,9 +1,6 @@
 [submodule "ZPUFlex"]
 	path = ZPUFlex
 	url = https://github.com/robinsonb5/ZPUFlex.git
-[submodule "JT12"]
-	path = jt12
-	url  = https://github.com/jotego/jt12.git
 [submodule "jt12"]
 	path = jt12
 	url = https://github.com/jotego/jt12.git
