@@ -1,5 +1,0 @@
-v1
-DSP_BALANCING_IMPLEMENTATION,DSP_BLOCKS,Virtual_Toplevel:virtualtoplevel|CtrlModule:mycontrolmodule|zpu_core_flex:zpu|lpm_mult:Mult0|mult_ubt:auto_generated|mac_out2,
-DSP_BALANCING_IMPLEMENTATION,DSP_BLOCKS,Virtual_Toplevel:virtualtoplevel|CtrlModule:mycontrolmodule|zpu_core_flex:zpu|lpm_mult:Mult0|mult_ubt:auto_generated|mac_out4,
-DSP_BALANCING_IMPLEMENTATION,DSP_BLOCKS,Virtual_Toplevel:virtualtoplevel|CtrlModule:mycontrolmodule|zpu_core_flex:zpu|lpm_mult:Mult0|mult_ubt:auto_generated|mac_out6,
-PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,Virtual_Toplevel:virtualtoplevel|CtrlModule:mycontrolmodule|zpu_core_flex:zpu|lpm_mult:Mult0|mult_ubt:auto_generated|mac_mult5,
