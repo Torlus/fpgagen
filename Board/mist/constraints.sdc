@@ -39,7 +39,10 @@ set_time_format -unit ns -decimal_places 3
 #**************************************************************
 
 create_clock -name clk_27 -period 37.04 [get_ports {CLOCK_27[0]}]
+create_clock -name fm_clk3 -period 388.9 -waveform { 0 129.64 } [get_nets {virtualtoplevel|fm|u_clksync|u_clkgen|cnt3[0]}]
 
+create_clock -name fm_clk6 -period 777.8 [get_nets {virtualtoplevel|fm|u_clksync|u_clkgen|clk_n6}]
+create_clock -name VCLK -period 129.6 [get_nets {virtualtoplevel|VCLK}]
 #create_clock -name SPICLK -period 40.000 [get_ports {SPI_SCK}]
 #create_clock -name SD_ACK -period 40.000 [get_keepers {user_io:user_io_d|sd_ack}]
 #create_clock -name sd_dout_strobe -period 40.000 [get_keepers {user_io:user_io_d|sd_dout_strobe}]
@@ -121,7 +124,13 @@ set_output_delay -clock sd1clk_pin -min 0.5 [get_ports SDRAM_CLK]
 
 # Asynchronous signal, so not important timing-wise
 set_false_path -from {*uart|txd} -to {UART_TX}
+# JT12 internal clock uses synchronizers:
+set_false_path  -from  [get_clocks {VCLK}]  -to  [get_clocks {fm_clk6}]
 
+#JT12 output is not synchronous to the DAC:
+set_false_path  -from  [get_clocks {fm_clk6}]  -to  [get_clocks {U00|altpll_component|auto_generated|pll1|clk[2]}]
+
+# set_false_path -from [get_registers {Virtual_Toplevel:virtualtoplevel|jt12:fm|jt12_clksync:u_clksync|write_copy}] -to [get_nets {virtualtoplevel|fm|u_clksync|write}]
 #**************************************************************
 # Set Multicycle Path
 #**************************************************************
