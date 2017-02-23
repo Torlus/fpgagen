@@ -66,9 +66,6 @@ entity CtrlModule is
 
 		-- Audio volumes
 		vol_master : out std_logic_vector(2 downto 0);
-		vol_opll : out std_logic_vector(2 downto 0);
-		vol_scc : out std_logic_vector(2 downto 0);
-		vol_psg : out std_logic_vector(2 downto 0);
 		
 		-- Gamepad emulation
 		gp1emu : out std_logic_vector(7 downto 0);
@@ -494,10 +491,7 @@ begin
 							mem_busy<='0';
 
 						when X"54" => -- Audio volumes
-							vol_master<=not mem_write(2 downto 0);
-							vol_opll<=mem_write(6 downto 4);
-							vol_scc<=mem_write(10 downto 8);
-							vol_psg<=mem_write(14 downto 12);
+							vol_master<=mem_write(2 downto 0);
 							mem_busy<='0';
 
 						when X"58" => -- Gamepads

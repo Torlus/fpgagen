@@ -1,3 +1,3 @@
-Warning (10268): Verilog HDL information at jt12_opsync.v(38): always construct contains both blocking and non-blocking assignments
 Warning (10268): Verilog HDL information at jt12_mmr.v(155): always construct contains both blocking and non-blocking assignments
+Warning (10268): Verilog HDL information at jt12_opsync.v(38): always construct contains both blocking and non-blocking assignments
 Info (10281): Verilog HDL Declaration information at osd.v(31): object "OSD_COLOR" differs only in case from object "osd_color" in the same scope

@@ -436,6 +436,7 @@ signal KEY : std_logic_vector(3 downto 0);
 signal gp1emu : std_logic_vector(7 downto 0);
 signal gp2emu : std_logic_vector(7 downto 0);
 
+signal volume : std_logic_vector(2 downto 0);
 
 -- DEBUG
 signal HEXVALUE			: std_logic_vector(15 downto 0);
@@ -2014,6 +2015,8 @@ mycontrolmodule : entity work.CtrlModule
 		vga_vsync => vga_vsync_i,
 		osd_window => osd_window,
 		osd_pixel => osd_pixel,
+		
+		vol_master => volume,
 		
 		-- Gamepad emulation
 		gp1emu => gp1emu,

@@ -360,8 +360,8 @@ static struct menu_entry topmenu[];
 
 static char *video_labels[]=
 {
-	"VGA - 31KHz, 60Hz",
-	"TV - 480i, 60Hz"
+	"VGA - 31KHz",
+	"TV - 15KHz"
 };
 
 
@@ -379,10 +379,27 @@ static struct menu_entry topmenu[]=
 	{MENU_ENTRY_CYCLE,(char *)video_labels,2},
 	{MENU_ENTRY_TOGGLE,"Scanlines",HW_HOST_SWB_SCANLINES},
 	{MENU_ENTRY_CYCLE,(char *)joyswap_labels,2},
+	{MENU_ENTRY_SLIDER,"Audio Volume",7},
 	{MENU_ENTRY_CALLBACK,"Load ROM \x10",MENU_ACTION(&showrommenu)},
 	{MENU_ENTRY_CALLBACK,"Exit",MENU_ACTION(&Menu_Hide)},
 	{MENU_ENTRY_NULL,0,0}
 };
+
+
+int GetVolume()
+{
+	struct menu_entry *m=&topmenu[5];
+	int result;
+	result=MENU_SLIDER_VALUE(m);
+	return(result);
+}
+
+
+void SetVolume(int v)
+{
+	struct menu_entry *m=&topmenu[5];
+	MENU_SLIDER_VALUE(m)=v&7;
+}
 
 
 int SetDIPSwitch(int d)
@@ -417,7 +434,9 @@ int main(int argc,char **argv)
 	int i;
 	multitap=1;
 	bootstatus=0;
+	int vol=7;
 	SetDIPSwitch(DEFAULT_DIPSWITCH_SETTINGS);
+	SetVolume(vol);
 	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_RESET;	// Reset then release, so that we get video output.
 	HW_HOST(HW_HOST_CTRL)=HW_HOST_CTRLF_SDCARD; // Steal the SD card too.
 
@@ -480,6 +499,24 @@ int main(int argc,char **argv)
 				PS2Wait();
 			}
 		}
+		if(TestKey(KEY_F1)&TESTKEY_NEWPRESS_F) // Newly pressed since last test?
+		{
+			--vol;
+			if(vol<0)
+				vol=0;
+			SetVolume(vol);
+			Menu_Draw();
+		}
+		if(TestKey(KEY_F2)&TESTKEY_NEWPRESS_F)
+		{
+			++vol;
+			if(vol>7)
+				vol=7;
+			SetVolume(vol);
+			Menu_Draw();
+		}
+		HW_HOST(HW_HOST_VOLUMES)=GetVolume();
+
 		if(visible)
 			HW_HOST(HW_HOST_CTRL)=bootstatus|HW_HOST_CTRLF_KEYBOARD;	// capture keyboard
 		else

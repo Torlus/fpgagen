@@ -49,7 +49,8 @@ int HandlePS2RawCodes();
 void ClearKeyboard();
 
 int TestKey(int rawcode);
-
+#define TESTKEY_PRESSED_F 1
+#define TESTKEY_NEWPRESS_F 2
 // Each keytable entry has two bits: bit 0 - currently pressed, bit 1 - pressed since last test
 extern unsigned int keytable[16];
 
