@@ -41,8 +41,12 @@ set_time_format -unit ns -decimal_places 3
 create_clock -name clk_27 -period 37.04 [get_ports {CLOCK_27[0]}]
 create_clock -name fm_clk3 -period 388.9 -waveform { 0 129.64 } [get_nets {virtualtoplevel|fm|u_clksync|u_clkgen|cnt3[0]}]
 
-create_clock -name fm_clk6 -period 777.8 [get_nets {virtualtoplevel|fm|u_clksync|u_clkgen|clk_n6}]
-create_clock -name VCLK -period 129.6 [get_nets {virtualtoplevel|VCLK}]
+#create_clock -name fm_clk6 -period 777.8 [get_nets {virtualtoplevel|fm|u_clksync|u_clkgen|clk_n6}]
+#create_clock -name VCLK -period 129.6 [get_nets {virtualtoplevel|VCLK}]
+
+create_generated_clock -name VCLK -source [get_nets {U00|altpll_component|auto_generated|wire_pll1_clk[0]}] -divide_by 7 -duty_cycle 57.1 [get_nets {virtualtoplevel|VCLK}]
+create_generated_clock -name fm_clk6 -source [get_nets {virtualtoplevel|VCLK}] -divide_by 6 -duty_cycle 50 -phase 0 [get_nets {virtualtoplevel|fm|u_clksync|u_clkgen|clk_n6}]
+
 #create_clock -name SPICLK -period 40.000 [get_ports {SPI_SCK}]
 #create_clock -name SD_ACK -period 40.000 [get_keepers {user_io:user_io_d|sd_ack}]
 #create_clock -name sd_dout_strobe -period 40.000 [get_keepers {user_io:user_io_d|sd_dout_strobe}]
