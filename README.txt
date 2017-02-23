@@ -16,13 +16,13 @@ Configs/VGA/FPGAGEN.CFG
 Then rename the file fpgagen.rbf to core.rbf
 
 ==== Building and installing the core ====
-The project depends on a submodule (ZPUFlex), so you need to type in the following commands after checkout.
+The project depends on submodule(s), so you need to type in the following commands after checkout.
 
 cd fpgagen
 git submodule init
 git submodule update
 
-The load the Quartus II project file, and build:
+Then load the Quartus II project file, and build:
 fpgagen/syn/mist/fpgagen.qpf
 
 When you have built the core, copy the following files to the root of your sdcard:
