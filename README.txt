@@ -16,7 +16,7 @@ Configs/VGA/FPGAGEN.CFG
 Then rename the file fpgagen.rbf to core.rbf
 
 ==== Building and installing the core ====
-The project depends on submodule(s), so you need to type in the following commands after checkout.
+The project depends on submodules, so you need to type in the following commands after checkout.
 
 cd fpgagen
 git submodule init
