@@ -104,7 +104,19 @@ component jt12 port(
 	dout: out std_logic_vector(7 downto 0);
 	snd_right:out std_logic_vector(13 downto 0);
 	snd_left:out std_logic_vector(13 downto 0);
+	clk_out : out std_logic;
+	sample	: out std_logic;	
     irq_n:out std_logic );
+end component;
+
+component jt12_amp_stereo port(
+	clk : in std_logic;
+	sample : in std_logic;
+	volume : in std_logic_vector(2 downto 0);
+	preleft: in std_logic_vector(13 downto 0);
+	preright: in std_logic_vector(13 downto 0);
+	postleft: out std_logic_vector(15 downto 0);
+	postright: out std_logic_vector(15 downto 0) );	
 end component;
 
 -- "FLASH"
@@ -331,6 +343,10 @@ signal FM_UDS_N				: std_logic;
 signal FM_LDS_N				: std_logic;
 signal FM_DI				: std_logic_vector(7 downto 0);
 signal FM_DO				: std_logic_vector(7 downto 0);
+signal FM_CLKOUT			: std_logic;
+signal FM_SAMPLE			: std_logic;
+signal FM_LEFT				: std_logic_vector(13 downto 0);
+signal FM_RIGHT				: std_logic_vector(13 downto 0);
 --signal FM_DTACK_N			: std_logic;
 
 signal TG68_FM_SEL		: std_logic;
@@ -436,7 +452,7 @@ signal KEY : std_logic_vector(3 downto 0);
 signal gp1emu : std_logic_vector(7 downto 0);
 signal gp2emu : std_logic_vector(7 downto 0);
 
-signal volume : std_logic_vector(2 downto 0);
+signal FM_VOLUME : std_logic_vector(2 downto 0);
 
 -- DEBUG
 signal HEXVALUE			: std_logic_vector(15 downto 0);
@@ -680,22 +696,33 @@ port map(
 
 -- FM
 
+fm_amp : jt12_amp_stereo
+port map(
+	clk		=> FM_CLKOUT,
+	volume	=> FM_VOLUME,
+	sample	=> FM_SAMPLE,
+	preleft	=> FM_LEFT,
+	preright=> FM_RIGHT,
+	postleft=> DAC_LDATA,
+	postright=>DAC_RDATA
+);
+
 fm : jt12
 port map(
 	rst		=> RST_VCLK,	-- gen-hw.txt line 328
 	clk		=> VCLK,
+	clk_out	=> FM_CLKOUT,
 		
 	cs_n	=> not FM_SEL,
 	addr	=> FM_A,
 	wr_n	=> FM_RNW,
 	din			=> FM_DI,
 	dout		=> FM_DO,
-	snd_left	=> DAC_LDATA(15 downto 2),
-	snd_right	=> DAC_RDATA(15 downto 2)
+	snd_left	=> FM_LEFT,
+	snd_right	=> FM_RIGHT,
+	sample		=> FM_SAMPLE
 );
 
-DAC_LDATA(1 downto 0) <= "00";
-DAC_RDATA(1 downto 0) <= "00";
 
 -- #############################################################################
 -- #############################################################################
@@ -2016,7 +2043,7 @@ mycontrolmodule : entity work.CtrlModule
 		osd_window => osd_window,
 		osd_pixel => osd_pixel,
 		
-		vol_master => volume,
+		vol_master => FM_VOLUME,
 		
 		-- Gamepad emulation
 		gp1emu => gp1emu,
