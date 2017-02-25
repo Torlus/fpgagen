@@ -102,8 +102,8 @@ component jt12 port(
 	wr_n: in std_logic;	
 	
 	dout: out std_logic_vector(7 downto 0);
-	snd_right:out std_logic_vector(13 downto 0);
-	snd_left:out std_logic_vector(13 downto 0);
+	snd_right:out std_logic_vector(11 downto 0);
+	snd_left:out std_logic_vector(11 downto 0);
 	clk_out : out std_logic;
 	sample	: out std_logic;	
     irq_n:out std_logic );
@@ -345,8 +345,11 @@ signal FM_DI				: std_logic_vector(7 downto 0);
 signal FM_DO				: std_logic_vector(7 downto 0);
 signal FM_CLKOUT			: std_logic;
 signal FM_SAMPLE			: std_logic;
-signal FM_LEFT				: std_logic_vector(13 downto 0);
-signal FM_RIGHT				: std_logic_vector(13 downto 0);
+signal FM_LEFT				: std_logic_vector(11 downto 0);
+signal FM_RIGHT				: std_logic_vector(11 downto 0);
+signal AMP_LEFT				: std_logic_vector(13 downto 0);
+signal AMP_RIGHT			: std_logic_vector(13 downto 0);
+
 --signal FM_DTACK_N			: std_logic;
 
 signal TG68_FM_SEL		: std_logic;
@@ -695,14 +698,16 @@ port map(
 );
 
 -- FM
+AMP_LEFT <= FM_LEFT & "00";
+AMP_RIGHT<= FM_RIGHT& "00";
 
 fm_amp : jt12_amp_stereo
 port map(
 	clk		=> FM_CLKOUT,
 	volume	=> FM_VOLUME,
 	sample	=> FM_SAMPLE,
-	preleft	=> FM_LEFT,
-	preright=> FM_RIGHT,
+	preleft	=> AMP_LEFT,
+	preright=> AMP_RIGHT,
 	postleft=> DAC_LDATA,
 	postright=>DAC_RDATA
 );

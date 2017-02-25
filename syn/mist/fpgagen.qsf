@@ -41,7 +41,7 @@ set_global_assignment -name DEVICE EP3C25E144C7
 set_global_assignment -name TOP_LEVEL_ENTITY MIST_Toplevel
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "12.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "00:29:53  MAY 10, 2013"
-set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
+set_global_assignment -name LAST_QUARTUS_VERSION 13.1
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name DEVICE_FILTER_PIN_COUNT 144
@@ -278,7 +278,6 @@ set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
 set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
 set_global_assignment -name ROUTER_CLOCKING_TOPOLOGY_ANALYSIS ON
 set_global_assignment -name OPTIMIZE_POWER_DURING_SYNTHESIS "EXTRA EFFORT"
-set_global_assignment -name SLD_FILE /home/amr/FPGA/Projects/fpgagen/syn/mist/stp1_auto_stripped.stp
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12_amp.v
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12.v
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12_acc.v
