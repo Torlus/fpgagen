@@ -372,6 +372,20 @@ static char *joyswap_labels[]=
 };
 
 
+static char *psg_labels[]=
+{
+	"PSG disable",
+	"PSG enable"
+};
+
+
+static char *fm_labels[]=
+{
+	"FM disable",
+	"FM enable"
+};
+
+
 static struct menu_entry topmenu[]=
 {
 	{MENU_ENTRY_CALLBACK,"Reset",MENU_ACTION(&reset)},
@@ -380,6 +394,8 @@ static struct menu_entry topmenu[]=
 	{MENU_ENTRY_TOGGLE,"Scanlines",HW_HOST_SWB_SCANLINES},
 	{MENU_ENTRY_CYCLE,(char *)joyswap_labels,2},
 	{MENU_ENTRY_SLIDER,"Audio Volume",7},
+	{MENU_ENTRY_CYCLE,(char *)psg_labels,2},
+	{MENU_ENTRY_CYCLE,(char *)fm_labels,2},
 	{MENU_ENTRY_CALLBACK,"Load ROM \x10",MENU_ACTION(&showrommenu)},
 	{MENU_ENTRY_CALLBACK,"Exit",MENU_ACTION(&Menu_Hide)},
 	{MENU_ENTRY_NULL,0,0}
@@ -408,6 +424,8 @@ int SetDIPSwitch(int d)
 	MENU_TOGGLE_VALUES=d&2; // Scanlines
 	m=&topmenu[2]; MENU_CYCLE_VALUE(m)=d&1; // Video mode
 	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&4 ? 1 : 0); // Joystick swap
+	m=&topmenu[6]; MENU_CYCLE_VALUE(m)=(d&8 ? 1 : 0); // PSG disable
+	m=&topmenu[7]; MENU_CYCLE_VALUE(m)=(d&16 ? 1 : 0); // FM disable
 }
 
 
@@ -422,6 +440,12 @@ int GetDIPSwitch()
 	m=&topmenu[4];
 	 	if(MENU_CYCLE_VALUE(m))
 			result|=4;	// Joystick swap
+	m=&topmenu[6];
+	 	if(MENU_CYCLE_VALUE(m))
+			result|=8;	// PSG disable
+	m=&topmenu[7];
+	 	if(MENU_CYCLE_VALUE(m))
+			result|=16;	// FM disable
 	if(multitap)
 		result|=HW_HOST_SWF_MULTITAP;
 

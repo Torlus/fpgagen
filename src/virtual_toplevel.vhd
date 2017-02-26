@@ -341,21 +341,23 @@ signal INTERLACE	: std_logic;
 signal FM_SEL				: std_logic;
 signal FM_A 				: std_logic_vector(1 downto 0);
 signal FM_RNW				: std_logic;
-signal FM_UDS_N				: std_logic;
-signal FM_LDS_N				: std_logic;
+signal FM_UDS_N			: std_logic;
+signal FM_LDS_N			: std_logic;
 signal FM_DI				: std_logic_vector(7 downto 0);
 signal FM_DO				: std_logic_vector(7 downto 0);
 signal FM_CLKOUT			: std_logic;
 signal FM_SAMPLE			: std_logic;
 signal FM_LEFT				: std_logic_vector(11 downto 0);
-signal FM_RIGHT				: std_logic_vector(11 downto 0);
+signal FM_RIGHT			: std_logic_vector(11 downto 0);
+signal FM_ENABLE			: std_logic;
 
 -- PSG
 signal PSG_SEL				: std_logic;
-signal T80_PSG_SEL			: std_logic;
-signal TG68_PSG_SEL			: std_logic;
+signal T80_PSG_SEL		: std_logic;
+signal TG68_PSG_SEL		: std_logic;
 signal PSG_DI				: std_logic_vector(7 downto 0);
 signal PSG_SND				: std_logic_vector(5 downto 0);
+signal PSG_ENABLE			: std_logic;
 
 --signal FM_DTACK_N			: std_logic;
 
@@ -462,7 +464,8 @@ signal KEY : std_logic_vector(3 downto 0);
 signal gp1emu : std_logic_vector(7 downto 0);
 signal gp2emu : std_logic_vector(7 downto 0);
 
-signal FM_VOLUME : std_logic_vector(2 downto 0);
+signal MASTER_VOLUME : std_logic_vector(2 downto 0);
+signal FM_VOLUME		: std_logic_vector(2 downto 0);
 
 -- DEBUG
 signal HEXVALUE			: std_logic_vector(15 downto 0);
@@ -488,7 +491,7 @@ DRAM_CKE <= '1';
 DRAM_CS_N <= '0';
 
 -- LED
-LED <= CART_EN;
+LED <= FM_ENABLE;
 
 -- -----------------------------------------------------------------------
 -- SDRAM Controller
@@ -718,15 +721,16 @@ port map(
 -- FM
 fm_amp : jt12_amp_stereo
 port map(
-	clk		=> FM_CLKOUT,
-	volume	=> FM_VOLUME,
-	sample	=> FM_SAMPLE,
-	psg		=> PSG_SND,
-	enable_psg=> '1',
-	fmleft	=> FM_LEFT,
-	fmright => FM_RIGHT,
-	postleft=> DAC_LDATA,
-	postright=>DAC_RDATA
+	clk			=> FM_CLKOUT,
+	volume		=> FM_VOLUME,
+	sample		=> FM_SAMPLE,
+	psg			=> PSG_SND,
+	enable_psg	=> PSG_ENABLE,
+	fmleft		=> FM_LEFT,
+	fmright		=> FM_RIGHT,
+--	fm_enable	=> FM_ENABLE,
+	postleft		=> DAC_LDATA,
+	postright	=> DAC_RDATA
 );
 
 fm : jt12
@@ -2107,7 +2111,7 @@ mycontrolmodule : entity work.CtrlModule
 		osd_window => osd_window,
 		osd_pixel => osd_pixel,
 		
-		vol_master => FM_VOLUME,
+		vol_master => MASTER_VOLUME,
 		
 		-- Gamepad emulation
 		gp1emu => gp1emu,
@@ -2156,6 +2160,10 @@ VGA_HS <= vga_hsync_i;
 VGA_VS <= vga_vsync_i;
 VID_15KHZ <= SW(0);
 
+-- Audio control
+FM_VOLUME <= MASTER_VOLUME when TG68_RES_N='1' else (others => '0');
+PSG_ENABLE <= not SW(3);
+FM_ENABLE <= not SW(4);
 
 -- #############################################################################
 -- #############################################################################
