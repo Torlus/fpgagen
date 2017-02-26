@@ -22,8 +22,7 @@ static struct menu_entry topmenu[];
 int dipswitch;
 int bootstatus=0;
 
-int multitap;
-#define DEFAULT_DIPSWITCH_SETTINGS HW_HOST_SWF_MULTITAP
+#define DEFAULT_DIPSWITCH_SETTINGS 0x00
 
 void SetVolumes(int v);
 int GetDIPSwitch();
@@ -324,28 +323,6 @@ static void listroms()
 		romfilenames[j][0]=0;
 }
 
-#if 0
-void load_pcengine(int row)
-{
-	dipswitch&=~HW_HOST_SWF_BITFLIP;
-	selectrom(row);
-}
-
-
-void load_tg16(int row)
-{
-	dipswitch|=HW_HOST_SWF_BITFLIP;
-	selectrom(row);
-}
-
-static struct hotkey hotkeys[]=
-{
-	{KEY_P,load_pcengine},
-	{KEY_T,load_tg16},
-	{0,0}
-};
-#endif
-
 
 static void showrommenu(int row)
 {
@@ -421,33 +398,31 @@ void SetVolume(int v)
 int SetDIPSwitch(int d)
 {
 	struct menu_entry *m;
-	MENU_TOGGLE_VALUES=d&2; // Scanlines
-	m=&topmenu[2]; MENU_CYCLE_VALUE(m)=d&1; // Video mode
-	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&4 ? 1 : 0); // Joystick swap
-	m=&topmenu[6]; MENU_CYCLE_VALUE(m)=(d&8 ? 1 : 0); // PSG disable
-	m=&topmenu[7]; MENU_CYCLE_VALUE(m)=(d&16 ? 1 : 0); // FM disable
+	MENU_TOGGLE_VALUES=d&0x02; // Scanlines
+	m=&topmenu[2]; MENU_CYCLE_VALUE(m)=d&0x01; // Video mode
+	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&0x04 ? 1 : 0); // Joystick swap
+	m=&topmenu[6]; MENU_CYCLE_VALUE(m)=(d&0x08 ? 1 : 0); // PSG disable
+	m=&topmenu[7]; MENU_CYCLE_VALUE(m)=(d&0x10 ? 1 : 0); // FM disable
 }
 
 
 int GetDIPSwitch()
 {
 	struct menu_entry *m;
-	int result=MENU_TOGGLE_VALUES&0x2; // Scanline
+	int result=MENU_TOGGLE_VALUES&0x02; // Scanline
 	int t;
 	m=&topmenu[2];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=1;	// Video mode
+			result|=0x01;	// Video mode
 	m=&topmenu[4];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=4;	// Joystick swap
+			result|=0x04;	// Joystick swap
 	m=&topmenu[6];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=8;	// PSG disable
+			result|=0x08;	// PSG disable
 	m=&topmenu[7];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=16;	// FM disable
-	if(multitap)
-		result|=HW_HOST_SWF_MULTITAP;
+			result|=0x10;	// FM disable
 
 	return(result);
 }
@@ -456,7 +431,6 @@ int GetDIPSwitch()
 int main(int argc,char **argv)
 {
 	int i;
-	multitap=1;
 	bootstatus=0;
 	int vol=7;
 	SetDIPSwitch(DEFAULT_DIPSWITCH_SETTINGS);

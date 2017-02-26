@@ -12,11 +12,6 @@
 #define HW_HOST_SWB_SCANLINES 1
 #define HW_HOST_SWF_SCANLINES 2
 
-#define HW_HOST_SWF_BITFLIP 4
-
-#define HW_HOST_SWB_MULTITAP 4
-#define HW_HOST_SWF_MULTITAP 16
-
 /* Control the host:
  *  Bit 0: 1=> Reset, 0=> Run
  *  Bit 1: 1=> Inhibit, 0=> Run
