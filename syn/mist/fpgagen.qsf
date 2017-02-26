@@ -278,6 +278,10 @@ set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
 set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
 set_global_assignment -name ROUTER_CLOCKING_TOPOLOGY_ANALYSIS ON
 set_global_assignment -name OPTIMIZE_POWER_DURING_SYNTHESIS "EXTRA EFFORT"
+set_global_assignment -name SEED 2
+set_global_assignment -name VHDL_FILE ../../src/psg/psg_tone.vhd
+set_global_assignment -name VHDL_FILE ../../src/psg/psg_noise.vhd
+set_global_assignment -name VHDL_FILE ../../src/psg/psg.vhd
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12_amp.v
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12.v
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12_acc.v

@@ -113,8 +113,10 @@ component jt12_amp_stereo port(
 	clk : in std_logic;
 	sample : in std_logic;
 	volume : in std_logic_vector(2 downto 0);
-	preleft: in std_logic_vector(13 downto 0);
-	preright: in std_logic_vector(13 downto 0);
+	psg	   : in std_logic_vector(5 downto 0);
+	enable_psg: in std_logic;
+	fmleft : in std_logic_vector(11 downto 0);
+	fmright: in std_logic_vector(11 downto 0);
 	postleft: out std_logic_vector(15 downto 0);
 	postright: out std_logic_vector(15 downto 0) );	
 end component;
@@ -347,8 +349,13 @@ signal FM_CLKOUT			: std_logic;
 signal FM_SAMPLE			: std_logic;
 signal FM_LEFT				: std_logic_vector(11 downto 0);
 signal FM_RIGHT				: std_logic_vector(11 downto 0);
-signal AMP_LEFT				: std_logic_vector(13 downto 0);
-signal AMP_RIGHT			: std_logic_vector(13 downto 0);
+
+-- PSG
+signal PSG_SEL				: std_logic;
+signal T80_PSG_SEL			: std_logic;
+signal TG68_PSG_SEL			: std_logic;
+signal PSG_DI				: std_logic_vector(7 downto 0);
+signal PSG_SND				: std_logic_vector(5 downto 0);
 
 --signal FM_DTACK_N			: std_logic;
 
@@ -697,17 +704,27 @@ port map(
 	VGA_VS			=> VDP_VGA_VS_N
 );
 
--- FM
-AMP_LEFT <= FM_LEFT & "00";
-AMP_RIGHT<= FM_RIGHT& "00";
+-- PSG
 
+u_psg : work.psg
+port map(
+	clk		=> T80_CLK_N,
+	clken	=> T80_CLKEN,
+	WR_n	=> not PSG_SEL,
+	D_in	=> PSG_DI,
+	output	=> PSG_SND
+);
+
+-- FM
 fm_amp : jt12_amp_stereo
 port map(
 	clk		=> FM_CLKOUT,
 	volume	=> FM_VOLUME,
 	sample	=> FM_SAMPLE,
-	preleft	=> AMP_LEFT,
-	preright=> AMP_RIGHT,
+	psg		=> PSG_SND,
+	enable_psg=> '1',
+	fmleft	=> FM_LEFT,
+	fmright => FM_RIGHT,
 	postleft=> DAC_LDATA,
 	postright=>DAC_RDATA
 );
@@ -1456,6 +1473,48 @@ begin
 	
 end process;
 
+-- PSG AREA
+-- Z80: 7F11h
+-- 68k: C00011
+process( MRST_N, MCLK, TG68_AS_N, 
+	TG68_A, TG68_DO, TG68_UDS_N, TG68_LDS_N,
+	BAR, T80_A, T80_MREQ_N, T80_WR_N )
+begin
+	if T80_A = x"7F11" 
+		and T80_MREQ_N = '0' and T80_WR_N = '0'
+	then
+		T80_PSG_SEL <= '1';			
+	else
+		T80_PSG_SEL <= '0';
+	end if;	
+
+	if TG68_A = x"C00011"
+		and TG68_AS_N = '0' and (TG68_UDS_N = '0' or TG68_LDS_N = '0') 
+	then	
+		TG68_PSG_SEL <= '1';		
+	else
+		TG68_PSG_SEL <= '0';
+	end if;	
+	
+	if MRST_N = '0' then
+		PSG_SEL<= '0';
+	elsif rising_edge(MCLK) then
+		if VCLK='0' then
+			if TG68_PSG_SEL = '1' then
+				PSG_SEL <= '1';
+				if TG68_A(0)='0' then
+					PSG_DI <= TG68_DO(15 downto 8);
+				else
+					PSG_DI <= TG68_DO(7 downto 0);
+				end if;
+			elsif T80_PSG_SEL = '1' then
+				PSG_SEL <= '1';
+				PSG_DI <= T80_DO;		
+			end if;
+		end if;
+	end if;
+	
+end process;
 
 -- Z80:
 -- 60 = 01100000
