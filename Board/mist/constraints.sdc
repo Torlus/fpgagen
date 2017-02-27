@@ -144,8 +144,8 @@ set_false_path  -from  [get_clocks {fm_clk6}]  -to  [get_clocks {U00|altpll_comp
 
 set_multicycle_path -from [get_clocks {sd1clk_pin}] -to [get_clocks {U00|altpll_component|auto_generated|pll1|clk[2]}] -setup -end 2
 
-# set_multicycle_path -through [get_nets {*zpu|Mult0*}] -setup -end 2
-# set_multicycle_path -through [get_nets {*zpu|Mult0*}] -hold -end 2
+set_multicycle_path -through [get_nets {*zpu|Mult0*}] -setup -end 2
+set_multicycle_path -through [get_nets {*zpu|Mult0*}] -hold -end 2
 
 #**************************************************************
 # Set Maximum Delay
