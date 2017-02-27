@@ -350,6 +350,8 @@ signal FM_SAMPLE			: std_logic;
 signal FM_LEFT				: std_logic_vector(11 downto 0);
 signal FM_RIGHT			: std_logic_vector(11 downto 0);
 signal FM_ENABLE			: std_logic;
+signal FM_AMP_LEFT		: std_logic_vector(11 downto 0);
+signal FM_AMP_RIGHT		: std_logic_vector(11 downto 0);
 
 -- PSG
 signal PSG_SEL				: std_logic;
@@ -465,7 +467,6 @@ signal gp1emu : std_logic_vector(7 downto 0);
 signal gp2emu : std_logic_vector(7 downto 0);
 
 signal MASTER_VOLUME : std_logic_vector(2 downto 0);
-signal FM_VOLUME		: std_logic_vector(2 downto 0);
 
 -- DEBUG
 signal HEXVALUE			: std_logic_vector(15 downto 0);
@@ -722,13 +723,12 @@ port map(
 fm_amp : jt12_amp_stereo
 port map(
 	clk			=> FM_CLKOUT,
-	volume		=> FM_VOLUME,
+	volume		=> MASTER_VOLUME,
 	sample		=> FM_SAMPLE,
 	psg			=> PSG_SND,
 	enable_psg	=> PSG_ENABLE,
-	fmleft		=> FM_LEFT,
-	fmright		=> FM_RIGHT,
---	fm_enable	=> FM_ENABLE,
+	fmleft		=> FM_AMP_LEFT,
+	fmright		=> FM_AMP_RIGHT,
 	postleft		=> DAC_LDATA,
 	postright	=> DAC_RDATA
 );
@@ -2161,9 +2161,10 @@ VGA_VS <= vga_vsync_i;
 VID_15KHZ <= SW(0);
 
 -- Audio control
-FM_VOLUME <= MASTER_VOLUME when TG68_RES_N='1' else (others => '0');
 PSG_ENABLE <= not SW(3);
 FM_ENABLE <= not SW(4);
+FM_AMP_LEFT <= FM_LEFT when FM_ENABLE='1' else (others => '0');
+FM_AMP_RIGHT <= FM_RIGHT when FM_ENABLE='1' else (others => '0');
 
 -- #############################################################################
 -- #############################################################################
