@@ -1,3 +1,9 @@
+-- History
+-- Jose Tejada @topapate
+--  v1. copied from SMS core of MiST
+--  v2. Modified to avoid the use of v as a clock
+
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -20,6 +26,7 @@ architecture rtl of psg_noise is
 begin
 
 	process (clk, tone)
+		variable feedback: std_logic;
 	begin
 		if rising_edge(clk) then
 			if counter="000000001" then
@@ -34,19 +41,15 @@ begin
 			else
 				counter <= counter-1;
 			end if;
-		end if;
-	end process;
-
-	process (v)
-		variable feedback: std_logic;
-	begin
-		if rising_edge(v) then
-			if (style(2)='1') then
-				feedback := shift(0) xor shift(3);
-			else
-				feedback := shift(0);
+			-- output update
+			if(v = '0') then
+				if (style(2)='1') then
+					feedback := shift(0) xor shift(3);
+				else
+					feedback := shift(0);
+				end if;
+				shift <= feedback & shift(15 downto 1);			
 			end if;
-			shift <= feedback & shift(15 downto 1);
 		end if;
 	end process;
 

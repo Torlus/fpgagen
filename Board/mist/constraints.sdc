@@ -45,9 +45,25 @@ create_clock -name fm_clk3 -period 388.9 -waveform { 0 129.64 } [get_nets {virtu
 #create_clock -name VCLK -period 129.6 [get_nets {virtualtoplevel|VCLK}]
 
 create_generated_clock -name VCLK -source [get_nets {U00|altpll_component|auto_generated|wire_pll1_clk[0]}] -divide_by 7 -duty_cycle 57.1 [get_nets {virtualtoplevel|VCLK}]
+# romrd_req is identified as a clock, it should not run faster than MCLK/2
+create_generated_clock -name romrd_req -source [get_nets {U00|altpll_component|auto_generated|wire_pll1_clk[0]}] -divide_by 7  [get_nets {virtualtoplevel|romrd_req}]
 create_generated_clock -name fm_clk6 -source [get_nets {virtualtoplevel|VCLK}] -divide_by 6 -duty_cycle 50 -phase 0 [get_nets {virtualtoplevel|fm|u_clksync|u_clkgen|clk_n6}]
+create_generated_clock -name ZCLK -source [get_nets {virtualtoplevel|VCLK}] -divide_by 14 -duty_cycle 50 [get_nets {virtualtoplevel|ZCLK}]
+create_generated_clock -name psg_clk -source [get_nets {virtualtoplevel|ZCLK}] -divide_by 32 [get_nets {virtualtoplevel|u_psg|clk_divide[4]}]
+#create_generated_clock -name psg_noise -source [get_nets {virtualtoplevel|u_psg|clk_divide[4]}] -divide_by 2 [get_nets {virtualtoplevel|u_psg|t3|v}]
 
-#create_clock -name SPICLK -period 40.000 [get_ports {SPI_SCK}]
+# spi clock is at most 1/2 of SDR_CLK (mem_clk) )pin of virtual_Toplevel
+create_generated_clock -name spi_SCK -source [get_pins {U00|altpll_component|auto_generated|pll1|clk[2]}] -divide_by 2 [get_nets {virtualtoplevel|mycontrolmodule|spi|sck}]
+create_generated_clock -name ps2_clk -source [get_pins {U00|altpll_component|auto_generated|pll1|clk[0]}] -divide_by 2400 [get_nets {ps2_clk}]
+
+# SD card read and write won't be faster than sd_sck/2, 
+create_generated_clock -name sd_read_000 -source [get_nets {virtualtoplevel|mycontrolmodule|spi|sck}] -divide_by 2 [get_nets {sd_card_d|read_state.000}]
+create_generated_clock -name sd_read_001 -source [get_nets {virtualtoplevel|mycontrolmodule|spi|sck}] -divide_by 2 [get_nets {sd_card_d|read_state.001}]
+create_generated_clock -name sd_write    -source [get_nets {virtualtoplevel|mycontrolmodule|spi|sck}] -divide_by 2 [get_nets {sd_card_d|write_state.110}]
+
+
+# This period is somehow arbitray. I have just set the board frequency. Better than nothing! (should we compare to nothing?)
+create_clock -name SPICLK -period 37.04 [get_ports {SPI_SCK}]
 #create_clock -name SD_ACK -period 40.000 [get_keepers {user_io:user_io_d|sd_ack}]
 #create_clock -name sd_dout_strobe -period 40.000 [get_keepers {user_io:user_io_d|sd_dout_strobe}]
 
@@ -58,6 +74,7 @@ create_generated_clock -name fm_clk6 -source [get_nets {virtualtoplevel|VCLK}] -
 derive_pll_clocks 
 create_generated_clock -name sd1clk_pin -source [get_pins {U00|altpll_component|auto_generated|pll1|clk[3]}] [get_ports {SDRAM_CLK}]
 create_generated_clock -name memclk -source [get_pins {U00|altpll_component|auto_generated|pll1|clk[2]}]
+# MCLK
 create_generated_clock -name sysclk -source [get_pins {U00|altpll_component|auto_generated|pll1|clk[0]}]
 
 #**************************************************************
