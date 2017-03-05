@@ -460,7 +460,7 @@ signal osd_pixel : std_logic;
 type romStates is (ROM_IDLE, ROM_READ);
 signal romState : romStates := ROM_IDLE;
 
-signal SW : std_logic_vector(11 downto 0);
+signal SW : std_logic_vector(15 downto 0);
 signal KEY : std_logic_vector(3 downto 0);
 
 signal gp1emu : std_logic_vector(7 downto 0);

@@ -107,13 +107,6 @@ static int LoadROM(const char *filename)
 		}
 #endif
 
-		if(filesize==(768*1024))
-			HW_HOST(HW_HOST_ROMMAPPING)=HW_HOST_ROMMAPPING_768;
-		else if(filesize==(384*1024))
-			HW_HOST(HW_HOST_ROMMAPPING)=HW_HOST_ROMMAPPING_384;
-		else
-			HW_HOST(HW_HOST_ROMMAPPING)=HW_HOST_ROMMAPPING_NONE;
-
 		result=1;
 
 		while(filesize>0)
@@ -363,6 +356,12 @@ static char *fm_labels[]=
 };
 
 
+static char *model_labels[]=
+{
+	"Megadrive model 1",
+	"Megadrive model 2"
+};
+
 static struct menu_entry topmenu[]=
 {
 	{MENU_ENTRY_CALLBACK,"Reset",MENU_ACTION(&reset)},
@@ -373,6 +372,7 @@ static struct menu_entry topmenu[]=
 	{MENU_ENTRY_SLIDER,"Audio Volume",7},
 	{MENU_ENTRY_CYCLE,(char *)psg_labels,2},
 	{MENU_ENTRY_CYCLE,(char *)fm_labels,2},
+	{MENU_ENTRY_CYCLE,(char *)model_labels,2},
 	{MENU_ENTRY_CALLBACK,"Load ROM \x10",MENU_ACTION(&showrommenu)},
 	{MENU_ENTRY_CALLBACK,"Exit",MENU_ACTION(&Menu_Hide)},
 	{MENU_ENTRY_NULL,0,0}
@@ -394,38 +394,49 @@ void SetVolume(int v)
 	MENU_SLIDER_VALUE(m)=v&7;
 }
 
+#define DIPSWITCHMASK (HW_HOST_SWF_SCANLINES | ((HW_HOST_SWF_MUTE6<<1) - HW_HOST_SWF_MUTE0)) // Scanlines and mute signals
 
 int SetDIPSwitch(int d)
 {
 	struct menu_entry *m;
-	MENU_TOGGLE_VALUES=d&0x02; // Scanlines
-	m=&topmenu[2]; MENU_CYCLE_VALUE(m)=d&0x01; // Video mode
-	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&0x04 ? 1 : 0); // Joystick swap
-	m=&topmenu[6]; MENU_CYCLE_VALUE(m)=(d&0x08 ? 1 : 0); // PSG disable
-	m=&topmenu[7]; MENU_CYCLE_VALUE(m)=(d&0x10 ? 1 : 0); // FM disable
+	MENU_TOGGLE_VALUES=d&DIPSWITCHMASK; // Scanlines and mute signals
+	m=&topmenu[2]; MENU_CYCLE_VALUE(m)=d&HW_HOST_SWF_VIDEOMODE; // Video mode
+	m=&topmenu[4]; MENU_CYCLE_VALUE(m)=(d&HW_HOST_SWF_JOYSTICKSWAP ? 1 : 0); // Joystick swap
+	m=&topmenu[6]; MENU_CYCLE_VALUE(m)=(d&HW_HOST_SWF_PSGENABLE ? 1 : 0); // PSG disable
+	m=&topmenu[7]; MENU_CYCLE_VALUE(m)=(d&HW_HOST_SWF_FMENABLE ? 1 : 0); // FM disable
+	m=&topmenu[8]; MENU_CYCLE_VALUE(m)=(d&HW_HOST_SWF_MODEL2 ? 1 : 0); // Megadrive model
 }
 
 
 int GetDIPSwitch()
 {
 	struct menu_entry *m;
-	int result=MENU_TOGGLE_VALUES&0x02; // Scanline
+	int result=MENU_TOGGLE_VALUES&DIPSWITCHMASK; // Scanline
 	int t;
 	m=&topmenu[2];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=0x01;	// Video mode
+			result|=HW_HOST_SWF_VIDEOMODE;	// Video mode
 	m=&topmenu[4];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=0x04;	// Joystick swap
+			result|=HW_HOST_SWF_JOYSTICKSWAP;	// Joystick swap
 	m=&topmenu[6];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=0x08;	// PSG disable
+			result|=HW_HOST_SWF_PSGENABLE;	// PSG disable
 	m=&topmenu[7];
 	 	if(MENU_CYCLE_VALUE(m))
-			result|=0x10;	// FM disable
+			result|=HW_HOST_SWF_FMENABLE;	// FM disable
+	m=&topmenu[8];
+	 	if(MENU_CYCLE_VALUE(m))
+			result|=HW_HOST_SWF_MODEL2;	// Megadrive model
 
 	return(result);
 }
+
+
+int mutechannelkeys[]=
+{
+	KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7
+};
 
 
 int main(int argc,char **argv)
@@ -481,10 +492,15 @@ int main(int argc,char **argv)
 	while(1)
 	{
 		int visible;
+		int channelmask;
+		int update;
 
 		HandlePS2RawCodes();
 		visible=Menu_Run();
+		
 		HW_HOST(HW_HOST_GAMEPAD)=joya<<8|joyb;
+
+		// Check for DIPSwitch changes from OSD and update the core if necessary.
 		if(GetDIPSwitch()!=dipswitch)
 		{
 			int i;
@@ -492,11 +508,32 @@ int main(int argc,char **argv)
 			HW_HOST(HW_HOST_SW)=dipswitch;
 			for(i=0;i<5;++i)
 			{
-				OSD_Show(visible);	// Refresh OSD position
+				OSD_Show(visible);	// Refresh OSD position - needed if video mode changed.
 				PS2Wait();
 				PS2Wait();
 			}
 		}
+
+		// Selectively mute FM channels
+		// This must happen after the check for changes to the dipswitch variable.
+		channelmask=HW_HOST_SWF_MUTE0;
+		update=0;
+		for(i=0;i<sizeof(mutechannelkeys)/sizeof(int);++i)
+		{
+			if(TestKey(mutechannelkeys[i])&TESTKEY_NEWPRESS_F)
+			{
+				dipswitch^=channelmask;
+				update=1;
+			}
+			channelmask<<=1;
+		}
+
+		if(update)
+		{
+			HW_HOST(HW_HOST_SW)=dipswitch;
+			SetDIPSwitch(dipswitch);
+		}
+
 		if(TestKey(KEY_F1)&TESTKEY_NEWPRESS_F) // Newly pressed since last test?
 		{
 			--vol;

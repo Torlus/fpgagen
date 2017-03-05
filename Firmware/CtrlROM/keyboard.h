@@ -17,6 +17,17 @@
 #define KEY_F11 0x78
 #define KEY_F12 0x7
 
+#define KEY_0 0x45
+#define KEY_1 0x16
+#define KEY_2 0x1e
+#define KEY_3 0x26
+#define KEY_4 0x25
+#define KEY_5 0x2E
+#define KEY_6 0x36
+#define KEY_7 0x3D
+#define KEY_8 0x3E
+#define KEY_9 0x46
+
 #define KEY_CAPSLOCK 0x58
 #define KEY_NUMLOCK 0x77
 #define KEY_SCROLLLOCK 0x7e

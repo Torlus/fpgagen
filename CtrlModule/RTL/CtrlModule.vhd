@@ -26,7 +26,7 @@ entity CtrlModule is
 		txd	: out std_logic;
 		
 		-- DIP switches
-		dipswitches : out std_logic_vector(11 downto 0);
+		dipswitches : out std_logic_vector(15 downto 0);
 
 		-- PS2 keyboard
 		ps2k_clk_in : in std_logic := '1';
@@ -466,7 +466,7 @@ begin
 							
 						when X"40" => -- Host SW
 							mem_busy<='0';
-							dipswitches<=mem_write(11 downto 0);
+							dipswitches<=mem_write(15 downto 0);
 							
 						when X"44" => -- Host control
 							host_reset_n<=not mem_write(0);
