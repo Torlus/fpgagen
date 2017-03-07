@@ -100,13 +100,19 @@ component jt12 port(
 	addr: in std_logic_vector(1 downto 0);
 	cs_n: in std_logic;
 	wr_n: in std_logic;	
+	limiter_en: in std_logic;
 	
 	dout: out std_logic_vector(7 downto 0);
 	snd_right:out std_logic_vector(11 downto 0);
 	snd_left:out std_logic_vector(11 downto 0);
 	clk_out : out std_logic;
 	sample	: out std_logic;	
-    irq_n:out std_logic );
+	-- Mux'ed output
+	mux_right	:out std_logic_vector(8 downto 0);
+	mux_left	:out std_logic_vector(8 downto 0);
+	mux_sample	:out std_logic;
+    irq_n:out std_logic
+);
 end component;
 
 component jt12_amp_stereo port(
@@ -119,6 +125,18 @@ component jt12_amp_stereo port(
 	fmright: in std_logic_vector(11 downto 0);
 	postleft: out std_logic_vector(15 downto 0);
 	postright: out std_logic_vector(15 downto 0) );	
+end component;
+
+component jt12_mixer port(
+	clk 		: in std_logic;
+	rst			: in std_logic;
+	sample 		: in std_logic;
+	left_in 	: in std_logic_vector(8 downto 0);
+	right_in	: in std_logic_vector(8 downto 0);
+	psg			: in std_logic_vector(5 downto 0);
+	enable_psg	: in std_logic;
+	left_out	: out std_logic_vector(15 downto 0);
+	right_out	: out std_logic_vector(15 downto 0) );	
 end component;
 
 -- "FLASH"
@@ -338,28 +356,30 @@ signal VDPC : vdpc_t;
 signal INTERLACE	: std_logic;
 
 -- FM AREA
-signal FM_SEL				: std_logic;
-signal FM_A 				: std_logic_vector(1 downto 0);
-signal FM_RNW				: std_logic;
+signal FM_SEL			: std_logic;
+signal FM_A 			: std_logic_vector(1 downto 0);
+signal FM_RNW			: std_logic;
 signal FM_UDS_N			: std_logic;
 signal FM_LDS_N			: std_logic;
-signal FM_DI				: std_logic_vector(7 downto 0);
-signal FM_DO				: std_logic_vector(7 downto 0);
-signal FM_CLKOUT			: std_logic;
-signal FM_SAMPLE			: std_logic;
-signal FM_LEFT				: std_logic_vector(11 downto 0);
+signal FM_DI			: std_logic_vector(7 downto 0);
+signal FM_DO			: std_logic_vector(7 downto 0);
+signal FM_CLKOUT		: std_logic;
+signal FM_SAMPLE		: std_logic;
+signal FM_LEFT			: std_logic_vector(11 downto 0);
 signal FM_RIGHT			: std_logic_vector(11 downto 0);
-signal FM_ENABLE			: std_logic;
+signal FM_MUX_LEFT		: std_logic_vector(8 downto 0);
+signal FM_MUX_RIGHT		: std_logic_vector(8 downto 0);
+signal FM_ENABLE		: std_logic;
 signal FM_AMP_LEFT		: std_logic_vector(11 downto 0);
 signal FM_AMP_RIGHT		: std_logic_vector(11 downto 0);
 
 -- PSG
-signal PSG_SEL				: std_logic;
+signal PSG_SEL			: std_logic;
 signal T80_PSG_SEL		: std_logic;
 signal TG68_PSG_SEL		: std_logic;
-signal PSG_DI				: std_logic_vector(7 downto 0);
-signal PSG_SND				: std_logic_vector(5 downto 0);
-signal PSG_ENABLE			: std_logic;
+signal PSG_DI			: std_logic_vector(7 downto 0);
+signal PSG_SND			: std_logic_vector(5 downto 0);
+signal PSG_ENABLE		: std_logic;
 
 --signal FM_DTACK_N			: std_logic;
 
@@ -720,33 +740,46 @@ port map(
 );
 
 -- FM
-fm_amp : jt12_amp_stereo
+fm_mixer:jt12_mixer
 port map(
-	clk			=> FM_CLKOUT,
-	volume		=> MASTER_VOLUME,
+	rst			=> RST_VCLK,
+	clk			=> MCLK,
 	sample		=> FM_SAMPLE,
+	left_in 	=> FM_MUX_LEFT,
+	right_in	=> FM_MUX_RIGHT,
 	psg			=> PSG_SND,
 	enable_psg	=> PSG_ENABLE,
-	fmleft		=> FM_AMP_LEFT,
-	fmright		=> FM_AMP_RIGHT,
-	postleft		=> DAC_LDATA,
-	postright	=> DAC_RDATA
+	left_out	=> DAC_LDATA,
+	right_out	=> DAC_RDATA
 );
+--fm_amp : jt12_amp_stereo
+--port map(
+--	clk			=> FM_CLKOUT,
+--	volume		=> MASTER_VOLUME,
+--	sample		=> FM_SAMPLE,
+--	psg			=> PSG_SND,
+--	enable_psg	=> PSG_ENABLE,
+--	fmleft		=> FM_AMP_LEFT,
+--	fmright		=> FM_AMP_RIGHT,
+--	postleft		=> DAC_LDATA,
+--	postright	=> DAC_RDATA
+--);
 
 fm : jt12
 port map(
 	rst		=> RST_VCLK,	-- gen-hw.txt line 328
 	clk		=> VCLK,
 	clk_out	=> FM_CLKOUT,
-		
+	
+	limiter_en => not SW(5),
 	cs_n	=> not FM_SEL,
 	addr	=> FM_A,
 	wr_n	=> FM_RNW,
 	din			=> FM_DI,
 	dout		=> FM_DO,
-	snd_left	=> FM_LEFT,
-	snd_right	=> FM_RIGHT,
-	sample		=> FM_SAMPLE
+	mux_left	=> FM_MUX_LEFT,
+	mux_right	=> FM_MUX_RIGHT,
+	mux_sample	=> FM_SAMPLE
 );
 
 

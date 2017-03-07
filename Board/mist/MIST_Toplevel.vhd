@@ -406,7 +406,7 @@ VGA_VS <= '1' when vid_15khz='1' else vga_tvs;
 leftsd: component hybrid_pwm_sd
 	port map
 	(
-		clk => memclk,
+		clk => MCLK,
 		n_reset => reset,
 		din => not audiol(15) & std_logic_vector(audiol(14 downto 0)),
 		dout => AUDIO_L
@@ -415,7 +415,7 @@ leftsd: component hybrid_pwm_sd
 rightsd: component hybrid_pwm_sd
 	port map
 	(
-		clk => memclk,
+		clk => MCLK,
 		n_reset => reset,
 		din => not audior(15) & std_logic_vector(audior(14 downto 0)),
 		dout => AUDIO_R
