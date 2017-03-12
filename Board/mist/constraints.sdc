@@ -64,6 +64,8 @@ create_generated_clock -name sd_write    -source [get_nets {virtualtoplevel|myco
 
 # This period is somehow arbitray. I have just set the board frequency. Better than nothing! (should we compare to nothing?)
 create_clock -name SPICLK -period 37.04 [get_ports {SPI_SCK}]
+create_clock -name spirecoveredclock -period 37.04 [get_keepers {spirecoveredclock}]
+
 #create_clock -name SD_ACK -period 40.000 [get_keepers {user_io:user_io_d|sd_ack}]
 #create_clock -name sd_dout_strobe -period 40.000 [get_keepers {user_io:user_io_d|sd_dout_strobe}]
 

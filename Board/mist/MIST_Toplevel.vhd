@@ -117,6 +117,13 @@ signal ps2_mouse_clk_mix : std_logic;
 signal ps2_mouse_clk_out : std_logic;
 signal ps2_mouse_dat_out : std_logic;
 
+-- spi clock recovery
+signal spirecoveryclock : std_logic;  -- High frequency clock
+signal spisck_d : std_logic;
+signal spirec : std_logic;
+signal spirecoveredclock : std_logic;
+signal pll2_locked : std_logic;
+
 -- Sigma Delta audio
 COMPONENT hybrid_pwm_sd
 	PORT
@@ -215,6 +222,30 @@ component sd_card
 
 begin
 
+
+myrecoveryclock : entity work.SPIRecoveryClock
+port map
+(
+	inclk0 => CLOCK_27(0),
+	c0 => spirecoveryclock,
+	locked => pll2_locked
+);
+
+process(spirecoveryclock)
+begin
+	if rising_edge(spirecoveryclock) then
+		spisck_d <= SPI_SCK;	-- ~2.3ns
+--		spirec <= spisck_d;  -- 4.6ns
+		spirecoveredclock <= '0';
+		if (spirecoveredclock='1' and (spisck_d='1' or SPI_SCK='1'))
+			or (spirecoveredclock='0' and (spisck_d='1' and SPI_SCK='1')) then
+				spirecoveredclock <= '1';  -- 6.9ns
+		end if;
+	end if;
+end process;
+
+
+
   U00 : entity work.pll
     port map(
       inclk0 => CLOCK_27(0),	-- 27 MHz external
@@ -235,7 +266,7 @@ begin
 process(MCLK)
 begin
 	if rising_edge(MCLK) then
-		reset_d<=not (status(0) or status(2) or buttons(1)) or pll_locked;
+		reset_d<=not (status(0) or status(2) or buttons(1)) or pll_locked or pll2_locked;
 		reset<=reset_d;
 	end if;
 end process;
@@ -352,7 +383,7 @@ sd_card_d: component sd_card
 user_io_d : user_io
     generic map (STRLEN => 1)
     port map (
-      SPI_CLK => SPI_SCK,
+      SPI_CLK => spirecoveredclock,
       SPI_SS_IO => CONF_DATA0,
       SPI_MISO => SPI_DO,
       SPI_MOSI => SPI_DI,
