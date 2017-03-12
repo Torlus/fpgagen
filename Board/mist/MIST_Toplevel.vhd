@@ -46,6 +46,7 @@ END entity;
 architecture rtl of MIST_Toplevel is
 
 signal reset : std_logic;
+signal reset_d : std_logic;
 signal pll_locked : std_logic;
 signal MCLK      : std_logic;
 signal memclk      : std_logic;
@@ -229,7 +230,15 @@ begin
 -- reset from IO controller
 -- status bit 0 is always triggered by the i ocontroller on its own reset
 -- button 1 is the core specfic button in the mists front
-reset <= '0' when status(0)='1' or buttons(1)='1' or pll_locked='0' else '1';
+-- reset <= '0' when status(0)='1' or buttons(1)='1' or pll_locked='0' else '1';
+
+process(MCLK)
+begin
+	if rising_edge(MCLK) then
+		reset_d<=not (status(0) or status(2) or buttons(1)) or pll_locked;
+		reset<=reset_d;
+	end if;
+end process;
 
 -- MCLK?
 process(MCLK)
