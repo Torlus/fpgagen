@@ -266,7 +266,7 @@ end process;
 process(MCLK)
 begin
 	if rising_edge(MCLK) then
-		reset_d<=not (status(0) or status(2) or buttons(1)) or pll_locked or pll2_locked;
+		reset_d<=not (status(0) or status(2) or buttons(1)) and pll_locked and pll2_locked;
 		reset<=reset_d;
 	end if;
 end process;
