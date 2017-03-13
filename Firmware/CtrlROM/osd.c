@@ -114,10 +114,10 @@ void OSD_Show(int visible)
 	hh<<=4;
 	vh<<=3;
 
-	if(hh>1000)
-		pixelclock=3;
-	else
+	if(hh>500)
 		pixelclock=2;
+	else
+		pixelclock=1;
 
 	HW_OSD(REG_OSD_PIXELCLOCK)=(1<<pixelclock);
 

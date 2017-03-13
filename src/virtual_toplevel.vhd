@@ -742,7 +742,7 @@ port map(
 -- FM
 fm_mixer:jt12_mixer
 port map(
-	rst			=> RST_VCLK,
+	rst			=> not MRST_N,
 	clk			=> MCLK,
 	sample		=> FM_SAMPLE,
 	left_in 	=> FM_MUX_LEFT,
@@ -2106,7 +2106,8 @@ mycontrolmodule : entity work.CtrlModule
 		sysclk_frequency => 1080 -- Sysclk frequency * 10
 	)
 	port map (
-		clk => SDR_CLK,
+		clk => MCLK,
+		osdclk => SDR_CLK,
 		reset_n => reset,
 
 		-- SPI signals
