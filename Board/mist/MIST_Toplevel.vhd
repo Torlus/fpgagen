@@ -235,10 +235,11 @@ process(spirecoveryclock)
 begin
 	if rising_edge(spirecoveryclock) then
 		spisck_d <= SPI_SCK;	-- ~2.3ns
---		spirec <= spisck_d;  -- 4.6ns
+		spirec <= '0';
 		spirecoveredclock <= '0';
-		if (spirecoveredclock='1' and (spisck_d='1' or SPI_SCK='1'))
-			or (spirecoveredclock='0' and (spisck_d='1' and SPI_SCK='1')) then
+		if (spirec='1' and (spisck_d='1' or SPI_SCK='1'))
+			or (spirec='0' and (spisck_d='1' and SPI_SCK='1')) then
+				spirec <= '1';  -- 6.9ns
 				spirecoveredclock <= '1';  -- 6.9ns
 		end if;
 	end if;
