@@ -3,10 +3,9 @@ MiST, Turbo Chameleon 64, Altera/Terasic DE2 board
 
 The core shall be considered a work in progress as there are multiple issues:
 1. Sprite flickering on heavy scenes, or on large sprites
-2. No sound yet, the Z80 is in but not any sound chip
+2. No LFO modulation of the FM sound
 3. Rom file formats supported are .bin and .gen, no support for .smd files
-4. 15 kHz video mode not supported yet, only VGA works
-5. The design does not fit on the Altera/Terasic DE1 board anymore
+4. The design does not fit on the Altera/Terasic DE1 board anymore
 
 ==== Installing the core ====
 If you are not buidling the core, copy the following files to the root of your sdcard:
@@ -27,7 +26,7 @@ fpgagen/syn/mist/fpgagen.qpf
 
 When you have built the core, copy the following files to the root of your sdcard:
 fpgagen/syn/mist/fpgagen.rbf
-fpgagen/Configs/VGA/FPGAGEN.CFG
+fpgagen/Configs/VGA/FPGAGEN.CFG, or fpgagen/Configs/TV/FPGAGEN.CFG (for 15 kHz video)
 
 Then rename the file fpgagen.rbf to core.rbf
 
