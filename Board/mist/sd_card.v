@@ -29,6 +29,9 @@
 // - CMD10: SEND_CID
 
 module sd_card (
+	input spiclk,
+	input uc_sysclk,
+	input fpga_sysclk,
 	// link to user_io for io controller
 	output [31:0] io_lba,
 	output reg    io_rd,
@@ -55,7 +58,10 @@ module sd_card (
 ); 
 
 // set io_rd once read_state machine starts waiting (rising edge of req_io_rd)
-// and clear it once io controller uploads something (io_ack==1) 
+// and clear it once io controller uploads something (io_ack==1)
+
+// FIXME - combinational reset signal
+
 wire req_io_rd = (read_state == 3'd1);
 wire io_reset = io_ack || sd_cs;
 always @(posedge req_io_rd or posedge io_reset) begin
@@ -71,21 +77,21 @@ end
 
 // set io_read_ack on falling edge of io_ack
 // reset it when not waiting for io controller (anymore)
-reg io_read_ack;
-wire io_read_wait_io = (read_state == 1);
-always @(negedge io_ack or negedge io_read_wait_io) begin
-	if(!io_read_wait_io) io_read_ack <= 1'b0;
-	else						io_read_ack <= 1'b1;
-end
+// reg io_read_ack;
+// wire io_read_wait_io = (read_state == 1);
+// always @(negedge io_ack or negedge io_read_wait_io) begin
+//	if(!io_read_wait_io) io_read_ack <= 1'b0;
+//	else						io_read_ack <= 1'b1;
+// end
 
 // set io_write_ack on falling edge of io_ack
 // reset it when not waiting for io controller (anymore)
-reg io_write_ack;
-wire io_write_wait_io = (write_state == 6);
-always @(negedge io_ack or negedge io_write_wait_io) begin
-	if(!io_write_wait_io) io_write_ack <= 1'b0;
-	else			 			 io_write_ack <= 1'b1;
-end
+//reg io_write_ack;
+//wire io_write_wait_io = (write_state == 6);
+//always @(negedge io_ack or negedge io_write_wait_io) begin
+//	if(!io_write_wait_io) io_write_ack <= 1'b0;
+//	else			 			 io_write_ack <= 1'b1;
+//end
 
 wire [31:0] OCR = { 1'b0, io_sdhc, 30'h0 };  // bit30 = 1 -> high capaciry card (sdhc)
 wire [7:0] READ_DATA_TOKEN = 8'hfe;
@@ -127,39 +133,134 @@ reg [7:0] write_data;
 wire reading = (read_state != 0);
 wire writing = (write_state != 0);
 
+
+// RAM access signals for each clock domain.
+
+reg[8:0] buffer_rptr_uc;
+reg[8:0] buffer_wptr_uc;
+wire [8:0] buffer_ptr_uc = reading ? buffer_wptr_uc : buffer_rptr_uc;
+reg [7:0] buffer_q_uc;
+wire buffer_wr_uc;
+wire [7:0] buffer_d_uc = io_din;
+
+reg[8:0] buffer_rptr_fpga;
+reg[8:0] buffer_wptr_fpga;
+wire [8:0] buffer_ptr_fpga = reading ? buffer_rptr_fpga : buffer_wptr_fpga;
+reg [7:0] buffer_q_fpga;
+wire buffer_wr_fpga;
+wire [7:0] buffer_d_fpga = write_data;
+
+// Dual port RAM with two clocks
+
+defparam sdbuffer.addrbits = 9;
+defparam sdbuffer.databits = 8;
+
+DualPortDualClockRAM sdbuffer(
+	.clock_a(uc_sysclk), // spiclk),
+	.address_a(buffer_ptr_uc),
+	.data_a(buffer_d_uc),
+	.q_a(buffer_q_uc),
+	.wren_a(buffer_wr_uc),
+
+	.clock_b(fpga_sysclk),
+	.address_b(buffer_ptr_fpga),
+	.data_b(buffer_d_fpga),
+	.q_b(buffer_q_fpga),
+	.wren_b(buffer_wr_fpga)
+);
+
+// uC-facing port
+
+// The Reading flag implies that data flow is uC -> FPGA
+reg [2:0] din_strobe_d;
+
+assign  buffer_wr_uc = (reading) && (din_strobe_d[1]==1'b1) && (din_strobe_d[2]==1'b0);
+
+always @(posedge uc_sysclk or posedge sd_cs) begin // was spiclk
+	if(sd_cs == 1) begin
+		buffer_wptr_uc <= 9'd0;
+		din_strobe_d<=1'b0;
+	end else begin
+		if(din_strobe_d[1]==1'b0 && din_strobe_d[2]==1'b1) begin // falling edge
+			buffer_wptr_uc <= buffer_wptr_uc + 9'd1;
+		end
+		din_strobe_d<={din_strobe_d[1:0],io_din_strobe};
+	end
+end
+
+
+reg sd_sck_d;
+
+always@(posedge fpga_sysclk)	// Shouldn't need to sync; sd_sck is generated on fpga_sysclk
+	sd_sck_d <= sd_sck;
+
+
+// FPGA-facing port
+
+// The Reading flag implies that data flow is uC -> FPGA
+reg write_strobe_d;
+
+assign  buffer_wr_fpga = (!reading) && (write_strobe==1'b0) && (write_strobe_d==1'b1);
+
+always @(posedge fpga_sysclk or posedge sd_cs) begin
+	if(sd_cs == 1) begin
+		buffer_wptr_fpga <= 9'd0;
+	end else if (sd_sck_d==1'b1 && sd_sck==1'b0) begin
+		if(write_strobe==1'b0 && write_strobe_d==1'b1) begin
+			buffer_wptr_fpga <= buffer_wptr_fpga + 9'd1;
+		end
+		write_strobe_d<=write_strobe;
+	end
+end
+
+
 // the buffer itself. Can hold one sector
-reg [8:0] buffer_wptr;
-reg [8:0] buffer_rptr;
-reg [7:0] buffer [511:0];
-reg [7:0] buffer_byte;
+// reg [8:0] buffer_wptr;
+// reg [8:0] buffer_rptr;
+// reg [8:0] buffer_rptr_nr;
+// reg [7:0] buffer [511:0];
+reg [7:0] buffer_byte_r;
+reg [7:0] buffer_byte_nr;
 
 // ---------------- buffer read engine -----------------------
 reg core_buffer_read_strobe;
 wire buffer_read_latch = reading?sd_sck:io_dout_strobe;
-wire buffer_read_strobe = reading?core_buffer_read_strobe:!io_dout_strobe;
+//wire buffer_read_strobe = reading?core_buffer_read_strobe:!io_dout_strobe;
+wire [7:0] buffer_byte = reading?buffer_byte_r:buffer_byte_nr;
 assign io_dout = buffer_byte;
 
 // sdo is sampled on negative sd clock so set it on positive edge
-always @(posedge buffer_read_latch)
-	buffer_byte <= buffer[buffer_rptr];
+always @(posedge fpga_sysclk) // sd_sck)
+	buffer_byte_r <= buffer_q_fpga;
+//	buffer_byte_r <= buffer[buffer_rptr];
+	
+always @(posedge io_dout_strobe)
+	buffer_byte_nr <= buffer_q_uc;
+//	buffer_byte_nr <= buffer[buffer_rptr];
 
-always @(posedge buffer_read_strobe or posedge sd_cs) begin
-	if(sd_cs == 1) buffer_rptr <= 9'd0;
-	else 		      buffer_rptr <= buffer_rptr + 9'd1;
+// always @(negedge core_buffer_read_strobe or posedge sd_cs) begin
+//	if(sd_cs == 1) buffer_rptr_fpga <= 9'd0;
+//	else 		      buffer_rptr_fpga <= buffer_rptr_fpga + 9'd1;
+//end
+
+always @(posedge io_dout_strobe or posedge sd_cs) begin
+	if(sd_cs == 1) buffer_rptr_uc <= 9'd0;
+	else 		      buffer_rptr_uc <= buffer_rptr_uc + 9'd1;
 end
 	
 // ---------------- buffer write engine -----------------------
-wire [7:0] buffer_din = reading?io_din:write_data;
-wire buffer_din_strobe = reading?io_din_strobe:write_strobe;
+//wire [7:0] buffer_din = reading?io_din:write_data;
+//wire buffer_din_strobe = reading?io_din_strobe:write_strobe;
+//
+//always @(negedge buffer_din_strobe or posedge sd_cs) begin
+//	if(sd_cs == 1) begin
+//		buffer_wptr <= 9'd0;
+//	end else begin
+//		buffer[buffer_wptr] <= buffer_din;	
+//		buffer_wptr <= buffer_wptr + 9'd1;
+//	end
+//end
 
-always @(negedge buffer_din_strobe or posedge sd_cs) begin
-	if(sd_cs == 1) begin
-		buffer_wptr <= 9'd0;
-	end else begin
-		buffer[buffer_wptr] <= buffer_din;	
-		buffer_wptr <= buffer_wptr + 9'd1;
-	end
-end
 
 wire [7:0] WRITE_DATA_RESPONSE = 8'h05;
 
@@ -195,19 +296,31 @@ always @(negedge io_din_strobe) begin
 	end
 end
 
-always @(posedge buffer_read_latch)
-	cid_byte <= cid[buffer_rptr];
 
-always @(posedge buffer_read_latch)
-	csd_byte <= csd[buffer_rptr];
-	
+// We can avoid the composite clock here since cid and csd are only
+// sent from card to host, not vice versa.
+
+always @(posedge fpga_sysclk) // sd_sck) // buffer_read_latch)
+	cid_byte <= cid[buffer_rptr_fpga];
+//	cid_byte <= cid[buffer_rptr];
+
+always @(posedge fpga_sysclk) // sd_sck) // buffer_read_latch)
+	csd_byte <= csd[buffer_rptr_fpga];
+//	csd_byte <= csd[buffer_rptr];
+
+
+// Synchronise io_ack on sd_sck domain
+reg [2:0] io_ack_d;
 
 // ----------------- spi transmitter --------------------
-always@(negedge sd_sck or posedge sd_cs) begin
+always@(posedge fpga_sysclk or posedge sd_cs) begin
 	if(sd_cs == 1) begin
 	   sd_sdo <= 1'b1;
 		read_state <= 3'd0;
-	end else begin
+		buffer_rptr_fpga <= 9'b0;
+	end else if (sd_sck_d==1'b1 && sd_sck==1'b0) begin  // Falling edge of sd_sck
+		io_ack_d <= {io_ack_d[1:0],io_ack}; // Sync ack signal
+		
 		core_buffer_read_strobe <= 1'b0;
 
 		// -------- catch read commmand and reset read state machine ------
@@ -244,7 +357,8 @@ always@(negedge sd_sck or posedge sd_cs) begin
 				sd_sdo <= 1'b1;
 				
 			// falling edge of io_ack signals end of incoming data stream
-			if((read_state == 3'd1) && io_read_ack) 
+//			if((read_state == 3'd1) && io_read_ack) 
+			if((read_state == 3'd1) && io_ack_d[2:1]==2'b10 ) 
 				read_state <= 3'd2;
 
 			// wait for begin of new byte
@@ -262,21 +376,25 @@ always@(negedge sd_sck or posedge sd_cs) begin
 			// send data
 			if(read_state == 3'd4) begin
 				if(cmd == 8'h51) 							// CMD17: READ_SINGLE_BLOCK
-					sd_sdo <= buffer_byte[~bit_cnt];
+					sd_sdo <= buffer_byte_r[~bit_cnt];
 				else if(cmd == 8'h49) 					// CMD9: SEND_CSD
 					sd_sdo <= csd_byte[~bit_cnt];
 				else if(cmd == 8'h4a) 					// CMD10: SEND_CID
 					sd_sdo <= cid_byte[~bit_cnt];
 
+//				if(bit_cnt == 6)
+//					buffer_rptr_fpga <= buffer_rptr_fpga + 9'd1;
+
 				if(bit_cnt == 7) begin
-					core_buffer_read_strobe <= 1'b1;
-				
+
+					buffer_rptr_fpga <= buffer_rptr_fpga + 9'd1;
+
 					// send 512 sector data bytes?
-					if((cmd == 8'h51) && (buffer_rptr == 511))
+					if((cmd == 8'h51) && (buffer_rptr_fpga == 511))
 						read_state <= 3'd5;   // next: send crc
 						
 					// send 16 cid/csd data bytes?
-					if(((cmd == 8'h49)||(cmd == 8'h4a)) && (buffer_rptr == 15))
+					if(((cmd == 8'h49)||(cmd == 8'h4a)) && (buffer_rptr_fpga == 15))
 						read_state <= 3'd0;   // return to idle state
 				end
 			end
@@ -306,8 +424,12 @@ always@(negedge sd_sck or posedge sd_cs) begin
    end
 end
 
+
+// Sync on posedge rather than negedge (could probably get away with using one synced signal on both edges.)
+reg [2:0] io_ack_dp;
+
 // spi receiver  
-always @(posedge sd_sck or posedge sd_cs) begin
+always @(posedge fpga_sysclk or posedge sd_cs) begin
 	// cs is active low
 	if(sd_cs == 1) begin
 		bit_cnt <= 3'd0;
@@ -315,10 +437,12 @@ always @(posedge sd_sck or posedge sd_cs) begin
 		cmd_cnt <= 8'd0;
 		write_state <= 3'd0;
 		write_strobe <= 1'b0;
-	end else begin 
+	end else if (sd_sck_d==1'b0 && sd_sck==1'b1) begin  // Rising edge of sd_sck begin 
 		write_strobe <= 1'b0;
 		sbuf[6:0] <= { sbuf[5:0], sd_sdi };
 		bit_cnt <= bit_cnt + 3'd1;
+
+		io_ack_dp <= {io_ack_dp[1:0],io_ack}; // Sync ack signal
 		
 		if((bit_cnt == 7)&&(byte_cnt != 255)) begin
 			byte_cnt <= byte_cnt + 8'd1;			
@@ -440,7 +564,7 @@ always @(posedge sd_sck or posedge sd_cs) begin
 				write_strobe <= 1'b1;
 				write_data <= { sbuf, sd_sdi};
 				
-				if(buffer_wptr == 511)
+				if(buffer_wptr_fpga == 511)
 					write_state <= 3'd3;
 			end
 	
@@ -460,7 +584,7 @@ always @(posedge sd_sck or posedge sd_cs) begin
 		// wait for io controller to accept data
 		// this happens outside the bit_cnt == 7 test as the 
 		// transition may happen at any time
-		if(write_state == 3'd6 && io_write_ack)
+		if(write_state == 3'd6 && io_ack_dp[2:1]==2'b10) // io_write_ack)
 			write_state <= 3'd0;
 	end
 end

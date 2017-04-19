@@ -45,6 +45,7 @@ ENTITY SPIRecoveryClock IS
 		areset		: IN STD_LOGIC  := '0';
 		inclk0		: IN STD_LOGIC  := '0';
 		c0		: OUT STD_LOGIC ;
+		c1		: OUT STD_LOGIC ;
 		locked		: OUT STD_LOGIC 
 	);
 END SPIRecoveryClock;
@@ -52,13 +53,14 @@ END SPIRecoveryClock;
 
 ARCHITECTURE SYN OF spirecoveryclock IS
 
-	SIGNAL sub_wire0	: STD_LOGIC ;
-	SIGNAL sub_wire1	: STD_LOGIC_VECTOR (4 DOWNTO 0);
+	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (4 DOWNTO 0);
+	SIGNAL sub_wire1	: STD_LOGIC ;
 	SIGNAL sub_wire2	: STD_LOGIC ;
 	SIGNAL sub_wire3	: STD_LOGIC ;
-	SIGNAL sub_wire4	: STD_LOGIC_VECTOR (1 DOWNTO 0);
-	SIGNAL sub_wire5_bv	: BIT_VECTOR (0 DOWNTO 0);
-	SIGNAL sub_wire5	: STD_LOGIC_VECTOR (0 DOWNTO 0);
+	SIGNAL sub_wire4	: STD_LOGIC ;
+	SIGNAL sub_wire5	: STD_LOGIC_VECTOR (1 DOWNTO 0);
+	SIGNAL sub_wire6_bv	: BIT_VECTOR (0 DOWNTO 0);
+	SIGNAL sub_wire6	: STD_LOGIC_VECTOR (0 DOWNTO 0);
 
 
 
@@ -69,6 +71,10 @@ ARCHITECTURE SYN OF spirecoveryclock IS
 		clk0_duty_cycle		: NATURAL;
 		clk0_multiply_by		: NATURAL;
 		clk0_phase_shift		: STRING;
+		clk1_divide_by		: NATURAL;
+		clk1_duty_cycle		: NATURAL;
+		clk1_multiply_by		: NATURAL;
+		clk1_phase_shift		: STRING;
 		compensate_clock		: STRING;
 		inclk0_input_frequency		: NATURAL;
 		intended_device_family		: STRING;
@@ -129,13 +135,15 @@ ARCHITECTURE SYN OF spirecoveryclock IS
 	END COMPONENT;
 
 BEGIN
-	sub_wire5_bv(0 DOWNTO 0) <= "0";
-	sub_wire5    <= To_stdlogicvector(sub_wire5_bv);
-	locked    <= sub_wire0;
-	sub_wire2    <= sub_wire1(0);
-	c0    <= sub_wire2;
-	sub_wire3    <= inclk0;
-	sub_wire4    <= sub_wire5(0 DOWNTO 0) & sub_wire3;
+	sub_wire6_bv(0 DOWNTO 0) <= "0";
+	sub_wire6    <= To_stdlogicvector(sub_wire6_bv);
+	sub_wire3    <= sub_wire0(0);
+	sub_wire1    <= sub_wire0(1);
+	c1    <= sub_wire1;
+	locked    <= sub_wire2;
+	c0    <= sub_wire3;
+	sub_wire4    <= inclk0;
+	sub_wire5    <= sub_wire6(0 DOWNTO 0) & sub_wire4;
 
 	altpll_component : altpll
 	GENERIC MAP (
@@ -144,6 +152,10 @@ BEGIN
 		clk0_duty_cycle => 50,
 		clk0_multiply_by => 16,
 		clk0_phase_shift => "0",
+		clk1_divide_by => 1,
+		clk1_duty_cycle => 50,
+		clk1_multiply_by => 4,
+		clk1_phase_shift => "0",
 		compensate_clock => "CLK0",
 		inclk0_input_frequency => 37037,
 		intended_device_family => "Cyclone III",
@@ -177,7 +189,7 @@ BEGIN
 		port_scanread => "PORT_UNUSED",
 		port_scanwrite => "PORT_UNUSED",
 		port_clk0 => "PORT_USED",
-		port_clk1 => "PORT_UNUSED",
+		port_clk1 => "PORT_USED",
 		port_clk2 => "PORT_UNUSED",
 		port_clk3 => "PORT_UNUSED",
 		port_clk4 => "PORT_UNUSED",
@@ -197,9 +209,9 @@ BEGIN
 	)
 	PORT MAP (
 		areset => areset,
-		inclk => sub_wire4,
-		locked => sub_wire0,
-		clk => sub_wire1
+		inclk => sub_wire5,
+		clk => sub_wire0,
+		locked => sub_wire2
 	);
 
 
@@ -226,8 +238,11 @@ END SYN;
 -- Retrieval info: PRIVATE: CUR_FBIN_CLK STRING "c0"
 -- Retrieval info: PRIVATE: DEVICE_SPEED_GRADE STRING "7"
 -- Retrieval info: PRIVATE: DIV_FACTOR0 NUMERIC "1"
+-- Retrieval info: PRIVATE: DIV_FACTOR1 NUMERIC "4"
 -- Retrieval info: PRIVATE: DUTY_CYCLE0 STRING "50.00000000"
+-- Retrieval info: PRIVATE: DUTY_CYCLE1 STRING "50.00000000"
 -- Retrieval info: PRIVATE: EFF_OUTPUT_FREQ_VALUE0 STRING "432.000000"
+-- Retrieval info: PRIVATE: EFF_OUTPUT_FREQ_VALUE1 STRING "108.000000"
 -- Retrieval info: PRIVATE: EXPLICIT_SWITCHOVER_COUNTER STRING "0"
 -- Retrieval info: PRIVATE: EXT_FEEDBACK_RADIO STRING "0"
 -- Retrieval info: PRIVATE: GLOCKED_COUNTER_EDIT_CHANGED STRING "1"
@@ -248,18 +263,26 @@ END SYN;
 -- Retrieval info: PRIVATE: LVDS_MODE_DATA_RATE STRING "Not Available"
 -- Retrieval info: PRIVATE: LVDS_MODE_DATA_RATE_DIRTY NUMERIC "0"
 -- Retrieval info: PRIVATE: LVDS_PHASE_SHIFT_UNIT0 STRING "deg"
+-- Retrieval info: PRIVATE: LVDS_PHASE_SHIFT_UNIT1 STRING "ps"
 -- Retrieval info: PRIVATE: MIG_DEVICE_SPEED_GRADE STRING "Any"
 -- Retrieval info: PRIVATE: MIRROR_CLK0 STRING "0"
+-- Retrieval info: PRIVATE: MIRROR_CLK1 STRING "0"
 -- Retrieval info: PRIVATE: MULT_FACTOR0 NUMERIC "16"
+-- Retrieval info: PRIVATE: MULT_FACTOR1 NUMERIC "16"
 -- Retrieval info: PRIVATE: NORMAL_MODE_RADIO STRING "1"
 -- Retrieval info: PRIVATE: OUTPUT_FREQ0 STRING "100.00000000"
+-- Retrieval info: PRIVATE: OUTPUT_FREQ1 STRING "100.00000000"
 -- Retrieval info: PRIVATE: OUTPUT_FREQ_MODE0 STRING "0"
+-- Retrieval info: PRIVATE: OUTPUT_FREQ_MODE1 STRING "0"
 -- Retrieval info: PRIVATE: OUTPUT_FREQ_UNIT0 STRING "MHz"
+-- Retrieval info: PRIVATE: OUTPUT_FREQ_UNIT1 STRING "MHz"
 -- Retrieval info: PRIVATE: PHASE_RECONFIG_FEATURE_ENABLED STRING "1"
 -- Retrieval info: PRIVATE: PHASE_RECONFIG_INPUTS_CHECK STRING "0"
 -- Retrieval info: PRIVATE: PHASE_SHIFT0 STRING "0.00000000"
+-- Retrieval info: PRIVATE: PHASE_SHIFT1 STRING "0.00000000"
 -- Retrieval info: PRIVATE: PHASE_SHIFT_STEP_ENABLED_CHECK STRING "0"
 -- Retrieval info: PRIVATE: PHASE_SHIFT_UNIT0 STRING "deg"
+-- Retrieval info: PRIVATE: PHASE_SHIFT_UNIT1 STRING "ps"
 -- Retrieval info: PRIVATE: PLL_ADVANCED_PARAM_CHECK STRING "0"
 -- Retrieval info: PRIVATE: PLL_ARESET_CHECK STRING "1"
 -- Retrieval info: PRIVATE: PLL_AUTOPLL_CHECK NUMERIC "1"
@@ -282,11 +305,14 @@ END SYN;
 -- Retrieval info: PRIVATE: SPREAD_USE STRING "0"
 -- Retrieval info: PRIVATE: SRC_SYNCH_COMP_RADIO STRING "0"
 -- Retrieval info: PRIVATE: STICKY_CLK0 STRING "1"
+-- Retrieval info: PRIVATE: STICKY_CLK1 STRING "1"
 -- Retrieval info: PRIVATE: SWITCHOVER_COUNT_EDIT NUMERIC "1"
 -- Retrieval info: PRIVATE: SWITCHOVER_FEATURE_ENABLED STRING "1"
 -- Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
 -- Retrieval info: PRIVATE: USE_CLK0 STRING "1"
+-- Retrieval info: PRIVATE: USE_CLK1 STRING "1"
 -- Retrieval info: PRIVATE: USE_CLKENA0 STRING "0"
+-- Retrieval info: PRIVATE: USE_CLKENA1 STRING "0"
 -- Retrieval info: PRIVATE: USE_MIL_SPEED_GRADE NUMERIC "0"
 -- Retrieval info: PRIVATE: ZERO_DELAY_RADIO STRING "0"
 -- Retrieval info: LIBRARY: altera_mf altera_mf.altera_mf_components.all
@@ -295,6 +321,10 @@ END SYN;
 -- Retrieval info: CONSTANT: CLK0_DUTY_CYCLE NUMERIC "50"
 -- Retrieval info: CONSTANT: CLK0_MULTIPLY_BY NUMERIC "16"
 -- Retrieval info: CONSTANT: CLK0_PHASE_SHIFT STRING "0"
+-- Retrieval info: CONSTANT: CLK1_DIVIDE_BY NUMERIC "1"
+-- Retrieval info: CONSTANT: CLK1_DUTY_CYCLE NUMERIC "50"
+-- Retrieval info: CONSTANT: CLK1_MULTIPLY_BY NUMERIC "4"
+-- Retrieval info: CONSTANT: CLK1_PHASE_SHIFT STRING "0"
 -- Retrieval info: CONSTANT: COMPENSATE_CLOCK STRING "CLK0"
 -- Retrieval info: CONSTANT: INCLK0_INPUT_FREQUENCY NUMERIC "37037"
 -- Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone III"
@@ -327,7 +357,7 @@ END SYN;
 -- Retrieval info: CONSTANT: PORT_SCANREAD STRING "PORT_UNUSED"
 -- Retrieval info: CONSTANT: PORT_SCANWRITE STRING "PORT_UNUSED"
 -- Retrieval info: CONSTANT: PORT_clk0 STRING "PORT_USED"
--- Retrieval info: CONSTANT: PORT_clk1 STRING "PORT_UNUSED"
+-- Retrieval info: CONSTANT: PORT_clk1 STRING "PORT_USED"
 -- Retrieval info: CONSTANT: PORT_clk2 STRING "PORT_UNUSED"
 -- Retrieval info: CONSTANT: PORT_clk3 STRING "PORT_UNUSED"
 -- Retrieval info: CONSTANT: PORT_clk4 STRING "PORT_UNUSED"
@@ -348,12 +378,14 @@ END SYN;
 -- Retrieval info: USED_PORT: @inclk 0 0 2 0 INPUT_CLK_EXT VCC "@inclk[1..0]"
 -- Retrieval info: USED_PORT: areset 0 0 0 0 INPUT GND "areset"
 -- Retrieval info: USED_PORT: c0 0 0 0 0 OUTPUT_CLK_EXT VCC "c0"
+-- Retrieval info: USED_PORT: c1 0 0 0 0 OUTPUT_CLK_EXT VCC "c1"
 -- Retrieval info: USED_PORT: inclk0 0 0 0 0 INPUT_CLK_EXT GND "inclk0"
 -- Retrieval info: USED_PORT: locked 0 0 0 0 OUTPUT GND "locked"
 -- Retrieval info: CONNECT: @areset 0 0 0 0 areset 0 0 0 0
 -- Retrieval info: CONNECT: @inclk 0 0 1 1 GND 0 0 0 0
 -- Retrieval info: CONNECT: @inclk 0 0 1 0 inclk0 0 0 0 0
 -- Retrieval info: CONNECT: c0 0 0 0 0 @clk 0 0 1 0
+-- Retrieval info: CONNECT: c1 0 0 0 0 @clk 0 0 1 1
 -- Retrieval info: CONNECT: locked 0 0 0 0 @locked 0 0 0 0
 -- Retrieval info: GEN_FILE: TYPE_NORMAL SPIRecoveryClock.vhd TRUE
 -- Retrieval info: GEN_FILE: TYPE_NORMAL SPIRecoveryClock.ppf TRUE

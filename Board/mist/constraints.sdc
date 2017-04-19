@@ -64,7 +64,10 @@ create_generated_clock -name sd_write    -source [get_nets {virtualtoplevel|myco
 
 # This period is somehow arbitray. I have just set the board frequency. Better than nothing! (should we compare to nothing?)
 create_clock -name SPICLK -period 37.04 [get_ports {SPI_SCK}]
-create_clock -name spirecoveredclock -period 37.04 [get_keepers {spirecoveredclock}]
+
+set_input_delay -clock { myrecoveryclock|altpll_component|auto_generated|pll1|clk[0] } 1 [get_ports {SPI_SCK}]
+set_input_delay -clock { spirecoveredclock } 0 [get_ports {SPI_DI}]
+set_output_delay -clock { spirecoveredclock } 3 [get_ports {SPI_DO}]
 
 #create_clock -name SD_ACK -period 40.000 [get_keepers {user_io:user_io_d|sd_ack}]
 #create_clock -name sd_dout_strobe -period 40.000 [get_keepers {user_io:user_io_d|sd_dout_strobe}]

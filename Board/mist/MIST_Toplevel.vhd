@@ -119,10 +119,21 @@ signal ps2_mouse_dat_out : std_logic;
 
 -- spi clock recovery
 signal spirecoveryclock : std_logic;  -- High frequency clock
+signal uc_sysclk : std_logic;
 signal spisck_d : std_logic;
 signal spirec : std_logic;
 signal spirecoveredclock : std_logic;
 signal pll2_locked : std_logic;
+
+-- Fast filter for SPI clock conditioning
+COMPONENT fastfilter
+	PORT
+	(
+		recoveryclock	: IN STD_LOGIC;
+		d	:	IN STD_LOGIC;
+		q	:	out STD_LOGIC
+	);
+END COMPONENT;
 
 -- Sigma Delta audio
 COMPONENT hybrid_pwm_sd
@@ -200,7 +211,11 @@ component mist_console
   end component mist_console;
 
 component sd_card
-   port (  io_lba 	: out std_logic_vector(31 downto 0);
+   port (
+			  spiclk : in std_logic;
+			  fpga_sysclk : in std_logic;
+			  uc_sysclk : in std_logic;
+			  io_lba 	: out std_logic_vector(31 downto 0);
 			  io_rd  	: out std_logic;
 			  io_wr  	: out std_logic;
 			  io_ack 	: in std_logic;
@@ -228,22 +243,17 @@ port map
 (
 	inclk0 => CLOCK_27(0),
 	c0 => spirecoveryclock,
+	c1 => uc_sysclk,
 	locked => pll2_locked
 );
 
-process(spirecoveryclock)
-begin
-	if rising_edge(spirecoveryclock) then
-		spisck_d <= SPI_SCK;	-- ~2.3ns
-		spirec <= '0';
-		spirecoveredclock <= '0';
-		if (spirec='1' and (spisck_d='1' or SPI_SCK='1'))
-			or (spirec='0' and (spisck_d='1' and SPI_SCK='1')) then
-				spirec <= '1';  -- 6.9ns
-				spirecoveredclock <= '1';  -- 6.9ns
-		end if;
-	end if;
-end process;
+myclockfilter : component fastfilter
+port map
+(
+	recoveryclock => spirecoveryclock,
+	d => SPI_SCK,
+	q => spirecoveredclock
+);
 
 
 
@@ -360,6 +370,9 @@ mist_console_d: component mist_console
 sd_card_d: component sd_card
 	port map
 	(
+		spiclk => spirecoveredclock,
+		uc_sysclk => uc_sysclk,
+		fpga_sysclk => memclk,
  		-- connection to io controller
  		io_lba => sd_lba,
  		io_rd  => sd_rd,

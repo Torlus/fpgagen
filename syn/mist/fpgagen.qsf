@@ -46,7 +46,7 @@ set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name DEVICE_FILTER_PIN_COUNT 144
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
-set_global_assignment -name ENABLE_SIGNALTAP ON
+set_global_assignment -name ENABLE_SIGNALTAP OFF
 set_global_assignment -name USE_SIGNALTAP_FILE stp2.stp
 set_location_assignment PIN_54 -to CLOCK_27[0]
 set_location_assignment PIN_55 -to CLOCK_27[1]
@@ -279,6 +279,8 @@ set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
 set_global_assignment -name ROUTER_CLOCKING_TOPOLOGY_ANALYSIS ON
 set_global_assignment -name OPTIMIZE_POWER_DURING_SYNTHESIS "EXTRA EFFORT"
 set_global_assignment -name SEED 2
+set_global_assignment -name VERILOG_FILE ../../Board/mist/fastfilter.v
+set_global_assignment -name VHDL_FILE ../../Board/mist/DualPortDualClockRAM.vhd
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12_interpol.v
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12_mixer.v
 set_global_assignment -name VERILOG_FILE ../../jt12/hdl/jt12_fir.v

@@ -86,8 +86,7 @@ wire [7:0] sd_cmd = { 4'h5, sd_conf, sd_sdhc, sd_wr, sd_rd };
 // filter spi clock. the 8 bit gate delay is ~2.5ns in total
 //wire [7:0] spi_sck_D = { spi_sck_D[6:0], SPI_CLK } /* synthesis keep */;
 //wire spi_sck = (spi_sck && spi_sck_D != 8'h00) || (!spi_sck && spi_sck_D == 8'hff);
-
-// AMR - experimenting with alternative clock filtering scheme.
+// AMR - experimenting with another clock conditioning method.
 wire spi_sck = SPI_CLK;
 
 // drive MISO only when transmitting core id
