@@ -55,17 +55,14 @@ entity vdp is
 		DO			: out std_logic_vector(15 downto 0);
 		DTACK_N		: out std_logic;
 
-		VRAM_ADDR	: out std_logic_vector(14 downto 0);
-		VRAM_CE_N	: out std_logic;
-		VRAM_UB_N	: out std_logic;
-		VRAM_LB_N	: out std_logic;
-		VRAM_DO		: in std_logic_vector(15 downto 0);
-		VRAM_DI		: out std_logic_vector(15 downto 0);
-		VRAM_OE_N	: out std_logic;
-		VRAM_WE_N	: out std_logic;
-
-		VRAM_SEL	: out std_logic;
-		VRAM_DTACK_N	: in std_logic;
+		vram_req : out std_logic;
+		vram_ack : in std_logic;
+		vram_we : out std_logic;
+		vram_a : out std_logic_vector(14 downto 0);
+		vram_d : out std_logic_vector(15 downto 0);
+		vram_q : in std_logic_vector(15 downto 0);
+		vram_u_n : out std_logic;
+		vram_l_n : out std_logic;
 		
 		INTERLACE	: in std_logic;
 
@@ -76,9 +73,6 @@ entity vdp is
 		VINT_T80	: out std_logic;
 		VINT_TG68_ACK	: in std_logic;
 		VINT_T80_ACK	: in std_logic;
-
-		VBUS_DMA_REQ	: out std_logic;
-		VBUS_DMA_ACK	: in std_logic;
 		
 		VBUS_ADDR		: out std_logic_vector(23 downto 0);
 		VBUS_UDS_N		: out std_logic;
@@ -87,6 +81,12 @@ entity vdp is
 		
 		VBUS_SEL		: out std_logic;
 		VBUS_DTACK_N	: in std_logic;
+
+		R		: out std_logic_vector(3 downto 0);
+		G		: out std_logic_vector(3 downto 0);
+		B		: out std_logic_vector(3 downto 0);
+		HS		: out std_logic;
+		VS		: out std_logic;
 		
 		VGA_R		: out std_logic_vector(3 downto 0);
 		VGA_G		: out std_logic_vector(3 downto 0);
@@ -97,6 +97,14 @@ entity vdp is
 end vdp;
 
 architecture rtl of vdp is
+
+
+signal vram_req_reg : std_logic;
+signal vram_we_reg : std_logic;
+signal vram_a_reg : std_logic_vector(14 downto 0);
+signal vram_d_reg : std_logic_vector(15 downto 0);
+signal vram_u_n_reg : std_logic;
+signal vram_l_n_reg : std_logic;
 
 ----------------------------------------------------------------
 -- ON-CHIP RAMS
@@ -276,7 +284,6 @@ signal DMAF_SET_REQ	: std_logic;
 signal DMAF_SET_ACK : std_logic;
 
 
-signal FF_VBUS_DMA_REQ	: std_logic;
 signal FF_VBUS_ADDR		: std_logic_vector(23 downto 0);
 signal FF_VBUS_UDS_N	: std_logic;
 signal FF_VBUS_LDS_N	: std_logic;
@@ -319,15 +326,15 @@ signal HV_VCNT		: std_logic_vector(9 downto 0);
 -- VRAM CONTROLLER
 ----------------------------------------------------------------
 
-signal FF_VRAM_ADDR	: std_logic_vector(14 downto 0);
-signal FF_VRAM_CE_N	: std_logic;
-signal FF_VRAM_UB_N	: std_logic;
-signal FF_VRAM_LB_N	: std_logic;
-signal FF_VRAM_DI	: std_logic_vector(15 downto 0);
-signal FF_VRAM_OE_N	: std_logic;
-signal FF_VRAM_WE_N	: std_logic;
+-- signal FF_VRAM_ADDR	: std_logic_vector(14 downto 0);
+-- signal FF_VRAM_CE_N	: std_logic;
+-- signal FF_VRAM_UB_N	: std_logic;
+-- signal FF_VRAM_LB_N	: std_logic;
+-- signal FF_VRAM_DI	: std_logic_vector(15 downto 0);
+-- signal FF_VRAM_OE_N	: std_logic;
+-- signal FF_VRAM_WE_N	: std_logic;
 
-signal FF_VRAM_SEL	: std_logic;
+-- signal FF_VRAM_SEL	: std_logic;
 
 type vmc_t is (
 	VMC_IDLE,
@@ -554,6 +561,10 @@ signal T_BGB_COLINFO	: std_logic_vector(6 downto 0);
 signal T_BGA_COLINFO	: std_logic_vector(6 downto 0);
 signal T_OBJ_COLINFO	: std_logic_vector(6 downto 0);
 signal T_COLOR			: std_logic_vector(15 downto 0);
+
+signal COLOR		: std_logic_vector(8 downto 0);
+signal FF_HS		: std_logic;
+signal FF_VS		: std_logic;
 
 -- Scandoubler
 type scanline_t is array(0 to (CLOCKS_PER_LINE/2)-1) of std_logic_vector(8 downto 0);
@@ -837,15 +848,12 @@ end process;
 ----------------------------------------------------------------
 -- VRAM CONTROLLER
 ----------------------------------------------------------------
-VRAM_ADDR <= FF_VRAM_ADDR;
-VRAM_CE_N <= FF_VRAM_CE_N;
-VRAM_OE_N <= FF_VRAM_OE_N;
-VRAM_WE_N <= FF_VRAM_WE_N;
-VRAM_UB_N <= FF_VRAM_UB_N;
-VRAM_LB_N <= FF_VRAM_LB_N;
-VRAM_DI <= FF_VRAM_DI;
-
-VRAM_SEL <= FF_VRAM_SEL;
+vram_req <= vram_req_reg;
+vram_we <= vram_we_reg;
+vram_a <= vram_a_reg;
+vram_d <= vram_d_reg;
+vram_u_n <= vram_u_n_reg;
+vram_l_n <= vram_l_n_reg;
 
 process( RST_N, CLK )
 -- synthesis translate_off
@@ -854,21 +862,14 @@ variable L	: line;
 -- synthesis translate_on
 begin
 	if RST_N = '0' then
-		FF_VRAM_ADDR <= (others => '0');
-		FF_VRAM_CE_N <= '1';
-		FF_VRAM_OE_N <= '1';
-		FF_VRAM_WE_N <= '1';
-		FF_VRAM_UB_N <= '1';
-		FF_VRAM_LB_N <= '1';
-		FF_VRAM_DI <= (others => '0');
-
-		FF_VRAM_SEL <= '0';
 		
 		BGB_DTACK_N <= '1';
 		BGA_DTACK_N <= '1';
 		SP1_DTACK_N <= '1';
 		SP2_DTACK_N <= '1';
 		DT_VRAM_DTACK_N <= '1';
+
+		vram_req_reg <= '0';
 		
 		VMC <= VMC_IDLE;
 	elsif rising_edge(CLK) then
@@ -890,182 +891,97 @@ begin
 		
 		case VMC is
 		when VMC_IDLE =>
+			vram_u_n_reg <= '0';
+			vram_l_n_reg <= '0';
+			vram_we_reg <= '0';
+			
 			if BGB_SEL = '1' and BGB_DTACK_N = '1' then
-				FF_VRAM_ADDR <= BGB_VRAM_ADDR;
-				FF_VRAM_CE_N <= '0';
+				vram_req_reg <= not vram_req_reg;
+				vram_a_reg <= BGB_VRAM_ADDR;
 				
 				VMC <= VMC_BGB_RD1;
 			elsif BGA_SEL = '1' and BGA_DTACK_N = '1' then
-				FF_VRAM_ADDR <= BGA_VRAM_ADDR;
-				FF_VRAM_CE_N <= '0';
+				vram_req_reg <= not vram_req_reg;
+				vram_a_reg <= BGA_VRAM_ADDR;
 				
 				VMC <= VMC_BGA_RD1;
 			elsif SP1_SEL = '1' and SP1_DTACK_N = '1' then
-				FF_VRAM_ADDR <= SP1_VRAM_ADDR;
-				FF_VRAM_CE_N <= '0';
+				vram_req_reg <= not vram_req_reg;
+				vram_a_reg <= SP1_VRAM_ADDR;
 				
 				VMC <= VMC_SP1_RD1;			
 			elsif SP2_SEL = '1' and SP2_DTACK_N = '1' then
-				FF_VRAM_ADDR <= SP2_VRAM_ADDR;
-				FF_VRAM_CE_N <= '0';
+				vram_req_reg <= not vram_req_reg;
+				vram_a_reg <= SP2_VRAM_ADDR;
 				
 				VMC <= VMC_SP2_RD1;			
 			elsif DT_VRAM_SEL = '1' and DT_VRAM_DTACK_N = '1' then
-				FF_VRAM_ADDR <= DT_VRAM_ADDR;
-				FF_VRAM_DI <= DT_VRAM_DI;
-				FF_VRAM_CE_N <= '0';
+-- synthesis translate_off					
+				if DT_VRAM_RNW = '0' then
+					write(L, string'("   VRAM WR ["));
+					hwrite(L, x"00" & DT_VRAM_ADDR & '0');
+					write(L, string'("] = ["));
+					if DT_VRAM_UDS_N = '0' and DT_VRAM_LDS_N ='1' then 
+						hwrite(L, DT_VRAM_DI(15 downto 8));
+						write(L, string'("  "));
+					elsif DT_VRAM_UDS_N = '1' and DT_VRAM_LDS_N ='0' then 
+						write(L, string'("  "));
+						hwrite(L, DT_VRAM_DI(7 downto 0));				
+					elsif DT_VRAM_UDS_N = '0' and DT_VRAM_LDS_N ='0' then 
+						hwrite(L, DT_VRAM_DI);
+					else
+						write(L, string'("????"));
+					end if;
+					write(L, string'("]"));
+					writeline(F,L);		
+				end if;
+-- synthesis translate_on					
+				vram_req_reg <= not vram_req_reg;
+				vram_a_reg <= DT_VRAM_ADDR;
+				vram_d_reg <= DT_VRAM_DI;
+				vram_we_reg <= not DT_VRAM_RNW;
+				vram_u_n_reg <= DT_VRAM_UDS_N;
+				vram_l_n_reg <= DT_VRAM_LDS_N;
 				
 				VMC <= VMC_DT_ACC1;
-			else
-				FF_VRAM_SEL <= '0';
 			end if;
 		
 		when VMC_BGB_RD1 =>		-- BACKGROUND B
-			FF_VRAM_OE_N <= '0';
-			FF_VRAM_WE_N <= '1';
-			FF_VRAM_UB_N <= '0';
-			FF_VRAM_LB_N <= '0';
-
-			FF_VRAM_SEL <= '1';
-			
-			VMC <= VMC_BGB_RD2;
-		
-		when VMC_BGB_RD2 =>
-			if VRAM_DTACK_N = '0' then
-				BGB_VRAM_DO <= VRAM_DO;
-				FF_VRAM_CE_N <= '1';
-				FF_VRAM_OE_N <= '1';
-				FF_VRAM_WE_N <= '1';
-				FF_VRAM_UB_N <= '1';
-				FF_VRAM_LB_N <= '1';
-				
+			if vram_req_reg = vram_ack then
+				BGB_VRAM_DO <= vram_q;
 				BGB_DTACK_N <= '0';
-				
-				FF_VRAM_SEL <= '0';
 				
 				VMC <= VMC_IDLE;
 			end if;
 				
 		when VMC_BGA_RD1 =>		-- BACKGROUND A
-			FF_VRAM_OE_N <= '0';
-			FF_VRAM_WE_N <= '1';
-			FF_VRAM_UB_N <= '0';
-			FF_VRAM_LB_N <= '0';
-
-			FF_VRAM_SEL <= '1';
-			
-			VMC <= VMC_BGA_RD2;
-		
-		when VMC_BGA_RD2 =>
-			if VRAM_DTACK_N = '0' then
-				BGA_VRAM_DO <= VRAM_DO;
-				FF_VRAM_CE_N <= '1';
-				FF_VRAM_OE_N <= '1';
-				FF_VRAM_WE_N <= '1';
-				FF_VRAM_UB_N <= '1';
-				FF_VRAM_LB_N <= '1';
-				
+			if vram_req_reg = vram_ack then
+				BGA_VRAM_DO <= vram_q;
 				BGA_DTACK_N <= '0';
-				
-				FF_VRAM_SEL <= '0';
 				
 				VMC <= VMC_IDLE;
 			end if;
 			
 		when VMC_SP1_RD1 =>		-- SPRITE ENGINE PART 1
-			FF_VRAM_OE_N <= '0';
-			FF_VRAM_WE_N <= '1';
-			FF_VRAM_UB_N <= '0';
-			FF_VRAM_LB_N <= '0';
-
-			FF_VRAM_SEL <= '1';
-			
-			VMC <= VMC_SP1_RD2;
-		
-		when VMC_SP1_RD2 =>
-			if VRAM_DTACK_N = '0' then
-				SP1_VRAM_DO <= VRAM_DO;
-				FF_VRAM_CE_N <= '1';
-				FF_VRAM_OE_N <= '1';
-				FF_VRAM_WE_N <= '1';
-				FF_VRAM_UB_N <= '1';
-				FF_VRAM_LB_N <= '1';
-				
+			if vram_req_reg = vram_ack then
+				SP1_VRAM_DO <= vram_q;
 				SP1_DTACK_N <= '0';
 				
-				FF_VRAM_SEL <= '0';
-				
 				VMC <= VMC_IDLE;
 			end if;
-				
-		when VMC_SP2_RD1 =>		-- SPRITE ENGINE PART 2
-			FF_VRAM_OE_N <= '0';
-			FF_VRAM_WE_N <= '1';
-			FF_VRAM_UB_N <= '0';
-			FF_VRAM_LB_N <= '0';
 
-			FF_VRAM_SEL <= '1';
-			
-			VMC <= VMC_SP2_RD2;
-		
-		when VMC_SP2_RD2 =>
-			if VRAM_DTACK_N = '0' then
-				SP2_VRAM_DO <= VRAM_DO;
-				FF_VRAM_CE_N <= '1';
-				FF_VRAM_OE_N <= '1';
-				FF_VRAM_WE_N <= '1';
-				FF_VRAM_UB_N <= '1';
-				FF_VRAM_LB_N <= '1';
-				
+		when VMC_SP2_RD1 =>		-- SPRITE ENGINE PART 2
+			if vram_req_reg = vram_ack then
+				SP2_VRAM_DO <= vram_q;
 				SP2_DTACK_N <= '0';
 				
-				FF_VRAM_SEL <= '0';
-				
 				VMC <= VMC_IDLE;
 			end if;
-			
+	
 		when VMC_DT_ACC1 =>		-- DATA TRANSFER
--- synthesis translate_off					
-			if DT_VRAM_RNW = '0' then
-				write(L, string'("   VRAM WR ["));
-				hwrite(L, x"00" & DT_VRAM_ADDR & '0');
-				write(L, string'("] = ["));
-				if DT_VRAM_UDS_N = '0' and DT_VRAM_LDS_N ='1' then 
-					hwrite(L, DT_VRAM_DI(15 downto 8));
-					write(L, string'("  "));
-				elsif DT_VRAM_UDS_N = '1' and DT_VRAM_LDS_N ='0' then 
-					write(L, string'("  "));
-					hwrite(L, DT_VRAM_DI(7 downto 0));				
-				elsif DT_VRAM_UDS_N = '0' and DT_VRAM_LDS_N ='0' then 
-					hwrite(L, DT_VRAM_DI);
-				else
-					write(L, string'("????"));
-				end if;
-				write(L, string'("]"));
-				writeline(F,L);		
-			end if;
--- synthesis translate_on					
-			FF_VRAM_OE_N <= not DT_VRAM_RNW;
-			FF_VRAM_WE_N <= DT_VRAM_RNW;
-			FF_VRAM_UB_N <= DT_VRAM_UDS_N;
-			FF_VRAM_LB_N <= DT_VRAM_LDS_N;
-
-			FF_VRAM_SEL <= '1';
-			
-			VMC <= VMC_DT_ACC2;
-			
-		when VMC_DT_ACC2 =>
-			if VRAM_DTACK_N = '0' then
-				DT_VRAM_DO <= VRAM_DO;
-				FF_VRAM_CE_N <= '1';
-				FF_VRAM_OE_N <= '1';
-				FF_VRAM_WE_N <= '1';
-				FF_VRAM_UB_N <= '1';
-				FF_VRAM_LB_N <= '1';
-				
+			if vram_req_reg = vram_ack then
+				DT_VRAM_DO <= vram_q;
 				DT_VRAM_DTACK_N <= '0';
-				
-				FF_VRAM_SEL <= '0';
 				
 				VMC <= VMC_IDLE;
 			end if;
@@ -2270,6 +2186,7 @@ process( CLK )
 begin
 	if rising_edge(CLK) then
 		if H_CNT(0) = '1' then
+			COLOR <= FF_R & FF_G & FF_B;
 			if V_CNT(1) = '0' then
 				LINE0( CONV_INTEGER(H_CNT(11 downto 1)) ) <= FF_R & FF_G & FF_B;
 			else
@@ -2305,8 +2222,15 @@ end process;
 process( RST_N, CLK )
 begin
 	if RST_N = '0' then
+		FF_VS <= '1';
 		FF_VGA_VS <= '1';
 	elsif rising_edge(CLK) then
+		if V_CNT = 0 then
+			FF_VS <= '0';
+		end if;
+		if V_CNT = (VS_LINES*2) then
+			FF_VS <= '1';
+		end if;
 		if V_CNT = 0 then
 			FF_VGA_VS <= '0';
 		elsif V_CNT = (VGA_VS_LINES*2) then
@@ -2319,8 +2243,15 @@ end process;
 process( RST_N, CLK )
 begin
 	if RST_N = '0' then
+		FF_HS <= '1';
 		FF_VGA_HS <= '1';
 	elsif rising_edge(CLK) then
+		if H_CNT = 0 then
+			FF_HS <= '0';
+		end if;
+		if H_CNT = HS_CLOCKS then
+			FF_HS <= '1';
+		end if;
 		if H_VGA_CNT = 0 then
 			FF_VGA_HS <= '0';
 		elsif H_VGA_CNT = VGA_HS_CLOCKS then
@@ -2334,6 +2265,11 @@ VGA_G <= FF_VGA_G;
 VGA_B <= FF_VGA_B;
 VGA_HS <= FF_VGA_HS;
 VGA_VS <= FF_VGA_VS;
+R <= COLOR(8 downto 6) & '0';
+G <= COLOR(5 downto 3) & '0';
+B <= COLOR(2 downto 0) & '0';
+HS <= FF_HS;
+VS <= FF_VS;
 
 ----------------------------------------------------------------
 -- VIDEO DEBUG
@@ -2356,7 +2292,6 @@ end process;
 ----------------------------------------------------------------
 -- DATA TRANSFER CONTROLLER
 ----------------------------------------------------------------
-VBUS_DMA_REQ <= FF_VBUS_DMA_REQ;
 VBUS_ADDR <= FF_VBUS_ADDR;
 VBUS_UDS_N <= FF_VBUS_UDS_N;
 VBUS_LDS_N <= FF_VBUS_LDS_N;
@@ -2388,7 +2323,6 @@ begin
 		DT_RD_DTACK_N <= '1';
 		DT_FF_DTACK_N <= '1';
 
-		FF_VBUS_DMA_REQ	<= '0';
 		FF_VBUS_ADDR <= (others => '0');
 		FF_VBUS_UDS_N <= '1';
 		FF_VBUS_LDS_N <= '1';

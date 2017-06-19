@@ -1,3 +1,35 @@
+This is a port of fpgagen - Genesis/Megadrive core to additional platform(s)
+MiST, Turbo Chameleon 64, Altera/Terasic DE2 board
+
+The core shall be considered a work in progress as there are multiple issues:
+1. Sprite flickering on heavy scenes, or on large sprites
+2. No LFO modulation of the FM sound
+3. Rom file formats supported are .bin and .gen, no support for .smd files
+4. The design does not fit on the Altera/Terasic DE1 board anymore
+
+==== Installing the core ====
+If you are not buidling the core, copy the following files to the root of your sdcard:
+fpgagen.rbf
+Configs/VGA/FPGAGEN.CFG
+
+Then rename the file fpgagen.rbf to core.rbf
+
+==== Building and installing the core ====
+The project depends on submodules, so you need to type in the following commands after checkout.
+
+cd fpgagen
+git submodule init
+git submodule update
+
+Then load the Quartus II project file, and build:
+fpgagen/syn/mist/fpgagen.qpf
+
+When you have built the core, copy the following files to the root of your sdcard:
+fpgagen/syn/mist/fpgagen.rbf
+fpgagen/Configs/VGA/FPGAGEN.CFG, or fpgagen/Configs/TV/FPGAGEN.CFG (for 15 kHz video)
+
+Then rename the file fpgagen.rbf to core.rbf
+
 ================================================================================
 fpgagen - a SEGA Megadrive/Genesis clone in a FPGA.
 Copyright (c) 2010-2013 Gregory Estrade (greg@torlus.com)

@@ -32,10 +32,13 @@
 -- make sure that this is not a derivative work and that
 -- you have the latest version of this file.
 
+-- Changed to 8-bit data bus in preparation for integrating JT12 sound chip
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
 
 entity gen_fm is
 	port(
@@ -45,11 +48,11 @@ entity gen_fm is
 		SEL			: in std_logic;
 		A			: in std_logic_vector(1 downto 0);
 		RNW			: in std_logic;
-		UDS_N		: in std_logic;
-		LDS_N		: in std_logic;
-		DI			: in std_logic_vector(15 downto 0);
-		DO			: out std_logic_vector(15 downto 0);
-		DTACK_N		: out std_logic		
+--		UDS_N		: in std_logic;
+--		LDS_N		: in std_logic;
+		DI			: in std_logic_vector(7 downto 0);
+		DO			: out std_logic_vector(7 downto 0)
+--		DTACK_N		: out std_logic		
 	);
 end gen_fm;
 
@@ -80,13 +83,13 @@ signal REG			: std_logic_vector(7 downto 0);
 
 begin
 
-DTACK_N <= FF_DTACK_N;
+-- DTACK_N <= FF_DTACK_N;
 
 STATUS(6 downto 2) <= "00000";
 STATUS(7) <= '0'; -- BUSY flag
 STATUS(1) <= TB_OVF;
 STATUS(0) <= TA_OVF;
-DO <= STATUS & STATUS;
+DO <= STATUS;
 
 -- CPU INTERFACE
 process( RST_N, CLK )
@@ -113,11 +116,11 @@ begin
 			FF_DTACK_N <= '1';
 		elsif SEL = '1' and FF_DTACK_N = '1' then
 			if RNW = '0' then
-				if UDS_N = '0' then
-					-- Address port
-					REG <= DI(15 downto 8);
-				else
-					-- Data port
+				if A = "00" then
+					-- Timer address port
+					REG <= DI(7 downto 0);
+				elsif A = "01" then
+					-- Timer data port
 					case REG is
 					when x"27" =>
 						TA_RESETCLK <= DI(4);

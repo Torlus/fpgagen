@@ -1,0 +1,10 @@
+
+syn/mist/db/
+
+syn/mist/incremental_db/
+
+syn/mist/fpgagen\.asm\.rpt
+
+*.bak
+
+syn/mist/fpgagen\.sta\.rpt
